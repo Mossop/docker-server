@@ -18,3 +18,5 @@ mossop/%:
 upload/%:
 	docker push $*:latest
 	@echo ""
+
+mossop/nginx-php: mossop/nginx
