@@ -1,3 +1,3 @@
 FROM mysql
 
-COPY conf.d/*.cnf /etc/mysql/conf.d
+COPY conf.d/*.cnf /etc/mysql/conf.d/
