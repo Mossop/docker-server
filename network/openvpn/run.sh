@@ -2,7 +2,7 @@
 
 cd /etc/openvpn.d
 
-for config in *.config; do
+for config in *.ovpn; do
   openvpn --daemon --config $config
 done
 
