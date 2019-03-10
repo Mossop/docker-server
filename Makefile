@@ -20,3 +20,5 @@ upload/%:
 	@echo ""
 
 mossop/nginx-php: mossop/nginx
+
+mossop/postfixadmin: mossop/nginx-php
