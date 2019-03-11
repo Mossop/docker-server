@@ -24,7 +24,8 @@ RUN apk add --no-cache \
     rm -rf /usr/src/openvpn && \
     cd / && \
     apk del --no-network .build-deps && \
-    mkdir -p /etc/openvpn.d
+    mkdir -p /etc/openvpn.d && \
+    mkdir -p /var/openvpn
 
 COPY run.sh /usr/local/bin/
 
