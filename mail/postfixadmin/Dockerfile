@@ -32,7 +32,8 @@ RUN curl -fsSL -o postfixadmin.tar.gz "https://github.com/postfixadmin/postfixad
     tar -xf postfixadmin.tar.gz -C /var/www/html --strip-components=1 && \
     rm postfixadmin.tar.gz && \
     # Does not exist in tarball but is required
-    mkdir -p /var/wwew/html/templates_c
+    mkdir -p /var/www/html/templates_c && \
+    chown -R www-data:www-data /var/www/html
 
 COPY vhosts.d/* /etc/nginx/vhosts.d/
 
