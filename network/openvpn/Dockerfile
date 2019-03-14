@@ -2,7 +2,8 @@ FROM alpine
 
 RUN apk add --no-cache \
       lzo \
-      lz4-dev && \
+      lz4-dev \
+      bash && \
     apk add --no-cache --virtual .build-deps \
       curl \
       gcc \
@@ -24,8 +25,8 @@ RUN apk add --no-cache \
     rm -rf /usr/src/openvpn && \
     cd / && \
     apk del --no-network .build-deps && \
-    mkdir -p /etc/openvpn.d && \
-    mkdir -p /var/openvpn
+    mkdir -p /etc/openvpn && \
+    mkdir -p /var/openvpn/pid
 
 COPY run.sh /usr/local/bin/
 

@@ -1,9 +1,18 @@
-#! /bin/sh
+#! /bin/bash
 
-cd /etc/openvpn.d
+cd /etc/openvpn
+
+function stop {
+  for pid in /var/openvpn/pid/*.pid; do
+    kill -s SIGTERM `cat $pid`
+  done
+  exit 0
+}
 
 for config in *.ovpn; do
-  openvpn --daemon --config $config
+  openvpn --daemon --writepid /var/openvpn/pid/$config.pid --config $config
 done
 
-tail -f /dev/null
+trap stop SIGTERM
+
+while true; do :; done
