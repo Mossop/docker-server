@@ -1,5 +1,10 @@
 FROM alpine
-RUN apk add --no-cache postfix && \
-    chown postfix:postfix /var/lib/postfix
+RUN apk add --no-cache \
+      postfix \
+      postfix-mysql && \
+    chown postfix:postfix /var/lib/postfix && \
+    postalias /etc/postfix/aliases
 
-CMD ["/usr/sbin/postfix", "start-fg"]
+COPY bin/* /usr/local/bin/
+
+CMD ["/usr/local/bin/run.sh"]
