@@ -1,3 +1,14 @@
 FROM php:fpm-alpine
 
-RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
+ENV EXTENSIONS="mysqli bz2 zip"
+
+RUN apk add --no-cache \
+      libbz2 \
+      libzip && \
+    apk add --no-cache --virtual .build-deps \
+      bzip2-dev \
+      zlib-dev \
+      libzip-dev && \
+    docker-php-ext-install $EXTENSIONS && \
+    docker-php-ext-enable $EXTENSIONS && \
+    apk del --no-network .build-deps
