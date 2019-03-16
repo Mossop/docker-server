@@ -1,8 +1,13 @@
 FROM alpine
-RUN apk add --no-cache dovecot && \
-    mv /etc/dovecot/conf.d /etc/dovecot/defaults.d && \
-    mkdir /etc/dovecot/conf.d && \
-    sed -i -e "s@include conf\\.d/@include defaults.d/@" /etc/dovecot/dovecot.conf && \
-    echo "!include_try conf.d/*.conf" >> /etc/dovecot/dovecot.conf
 
-CMD ["dovecot", "-F"]
+RUN apk add --no-cache \
+      dovecot \
+      dovecot-lmtpd \
+      dovecot-pop3d \
+      dovecot-mysql
+
+COPY bin/* /usr/local/bin/
+
+EXPOSE 24 993 995
+
+CMD ["/usr/local/bin/run.sh"]
