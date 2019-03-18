@@ -7,7 +7,7 @@ if [[ "$?" == "1" ]]; then
   exit 1
 fi
 
-for config in CONFIGS; do
+for config in $CONFIGS; do
   always openvpn --config $config &
 done
 
