@@ -1,0 +1,5 @@
+#! /bin/sh
+
+trap 'trap - TERM; kill -1' TERM
+tail -f /dev/null & wait
+exit 0

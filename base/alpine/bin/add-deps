@@ -1,0 +1,17 @@
+#! /bin/sh
+
+if [[ "$1" == "" ]]; then
+  ROOTDIR=/usr/local
+else
+  ROOTDIR=$1
+fi
+
+DEPS="$( \
+  scanelf --needed --nobanner --format '%n#p' --recursive $ROOTDIR \
+    | tr ',' '\n' \
+    | sort -u \
+    | awk 'system("[ -e $ROOTDIR/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+    | xargs echo \
+)"
+set -ex
+apk add --no-cache $DEPS
