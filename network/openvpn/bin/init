@@ -1,0 +1,14 @@
+#! /bin/sh
+
+cd /etc/openvpn
+CONFIGS=`ls *.ovpn 2>/dev/null`
+if [[ "$?" == "1" ]]; then
+  echo "No OpenVPN configurations found in /etc/openvpn"
+  exit 1
+fi
+
+for config in CONFIGS; do
+  always openvpn --config $config &
+done
+
+exec block

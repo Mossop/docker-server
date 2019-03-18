@@ -19,6 +19,8 @@ upload/%:
 	docker push $*:latest
 	@echo ""
 
+mossop/openvpn: mossop/alpine
+
 mossop/nginx-php: mossop/nginx
 
 mossop/postfixadmin: mossop/nginx-php
