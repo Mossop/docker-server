@@ -4,6 +4,6 @@ syslogd -C512
 dovecot
 
 trap 'trap - TERM; kill -1' TERM
-logread -f &
+logread -F &
 wait
 exit 0
