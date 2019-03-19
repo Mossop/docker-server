@@ -1,0 +1,9 @@
+#! /bin/sh
+
+syslogd -C512
+postfix start
+
+trap 'trap - TERM; kill -1' TERM
+logread -f &
+wait
+exit 0

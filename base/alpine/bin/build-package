@@ -6,12 +6,6 @@ TARGET=$1
 shift
 CONFARGS="--disable-static --prefix=/usr $@"
 
-# Default builds flags
-export CFLAGS="-Os -fomit-frame-pointer $CFLAGS"
-export CXXFLAGS="-Os -fomit-frame-pointer $CXXFLAGS"
-export CPPFLAGS="-Os -fomit-frame-pointer $CPPFLAGS"
-export LDFLAGS="-Wl,--as-needed"
-
 cd /usr/src/$PACKAGE
 
 echo "Configuring and building with arguments: $CONFARGS" > /dev/stderr
