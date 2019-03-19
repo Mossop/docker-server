@@ -1,0 +1,14 @@
+#! /bin/sh
+
+PACKAGE=$1
+URL=$2
+
+echo "Downloading source package from $URL" > /dev/stderr
+apk add --no-cache --virtual .get-source curl
+set -ex
+mkdir -p /usr/src/$PACKAGE
+cd /usr/src
+curl -s -o /usr/src/$PACKAGE.tar "$URL"
+tar -xf /usr/src/$PACKAGE.tar -C /usr/src/$PACKAGE --strip-components=1
+rm /usr/src/$PACKAGE.tar
+apk del --no-network .get-source

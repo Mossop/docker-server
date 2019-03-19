@@ -1,0 +1,25 @@
+#! /bin/sh
+
+PACKAGE=$1
+shift
+TARGET=$1
+shift
+CONFARGS="--disable-static --prefix=/usr $@"
+
+# Default builds flags
+export CFLAGS="-Os -fomit-frame-pointer $CFLAGS"
+export CXXFLAGS="-Os -fomit-frame-pointer $CXXFLAGS"
+export CPPFLAGS="-Os -fomit-frame-pointer $CPPFLAGS"
+export LDFLAGS="-Wl,--as-needed"
+
+cd /usr/src/$PACKAGE
+
+echo "Configuring and building with arguments: $CONFARGS" > /dev/stderr
+./configure $CONFARGS
+make
+
+mkdir -p /usr/src/$TARGET
+echo "Installing to temporary root" > /dev/stderr
+make DESTDIR=/usr/src/$TARGET install
+
+rm -rf /usr/src/$PACKAGE

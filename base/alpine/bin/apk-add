@@ -1,3 +1,4 @@
-# /bin/sh
+#! /bin/sh
 
+echo "Installing packages: $@" > /dev/stderr
 apk add --no-cache $@

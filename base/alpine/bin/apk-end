@@ -1,3 +1,4 @@
 #! /bin/sh
 
-apk del --no-network $@
+echo "Removing temporary packages" > /dev/stderr
+apk del --no-network $1

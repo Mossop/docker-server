@@ -1,18 +1,14 @@
 #! /bin/sh
 
 URL=$1
-CONFARGS=`echo $@ | sed -E -e "s@^[^[:space:]]+@@"`
+shift
+CONFARGS=$@
 
-set -ex
-mkdir -p /usr/src
-cd /usr/src
-curl -s -o package.tar "$URL"
-mkdir package
-tar -xf package.tar -C package --strip-components=1
-rm package.tar
-cd package
-./configure $CONFARGS
-make
-make install
-cd /
-rm -rf /usr/src/package
+PACKAGE=build
+TARGET=target
+
+set -e
+get-source $PACKAGE "$URL"
+build-package $PACKAGE $TARGET $CONFARGS
+strip-build $TARGET
+install-build $TARGET

@@ -1,8 +1,8 @@
 FROM mossop/alpine
 
-RUN set -ex && \
-    apk-begin .build-deps \
-      curl \
+ARG VERSION=2.4.7
+
+RUN apk-begin .build-deps \
       gcc \
       make \
       libc-dev \
@@ -10,7 +10,7 @@ RUN set -ex && \
       openssl-dev \
       lzo-dev \
       linux-pam-dev && \
-    conf-build https://swupdate.openvpn.org/community/releases/openvpn-2.4.7.tar.xz && \
+    conf-build https://swupdate.openvpn.org/community/releases/openvpn-$VERSION.tar.xz && \
     apk-end .build-deps && \
     add-deps && \
     mkdir -p /etc/openvpn && \

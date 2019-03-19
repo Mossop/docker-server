@@ -21,6 +21,8 @@ upload/%:
 
 mossop/openvpn: mossop/alpine
 
+mossop/dovecot: mossop/alpine
+
 mossop/nginx-php: mossop/nginx
 
 mossop/postfixadmin: mossop/nginx-php

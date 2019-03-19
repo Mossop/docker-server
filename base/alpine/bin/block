@@ -1,5 +1,11 @@
 #! /bin/sh
 
+FILE=$1
+if [[ "$FILE" == "" ]]; then
+  FILE="/dev/null"
+fi
+
 trap 'trap - TERM; kill -1' TERM
-tail -f /dev/null & wait
+tail -f $FILE &
+wait
 exit 0

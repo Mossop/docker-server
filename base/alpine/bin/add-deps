@@ -1,17 +1,19 @@
 #! /bin/sh
 
 if [[ "$1" == "" ]]; then
-  ROOTDIR=/usr/local
+  ROOTDIR=/usr
 else
   ROOTDIR=$1
 fi
 
-DEPS="$( \
-  scanelf --needed --nobanner --format '%n#p' --recursive $ROOTDIR \
-    | tr ',' '\n' \
-    | sort -u \
-    | awk 'system("[ -e $ROOTDIR/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-    | xargs echo \
+set -e
+find $ROOTDIR >/usr/src/alllibs
+DEPS="$(scanelf --needed --nobanner --format '%n#p' --recursive $ROOTDIR \
+  | tr ',' '\n' \
+  | sort -u \
+  | awk 'system("grep -q /" $1 "$ /usr/src/alllibs") == 0 { next } { print "so:" $1}' \
+  | xargs echo \
 )"
-set -ex
+rm /usr/src/alllibs
+echo "Installing derived dependencies: $DEPS" > /dev/stderr
 apk add --no-cache $DEPS

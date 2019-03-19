@@ -1,0 +1,21 @@
+#! /bin/sh
+
+if [[ "$1" == "" ]]; then
+  echo "Must give a name."
+  exit 1
+fi
+
+if [[ "$2" == "" ]]; then
+  echo "Must give a home directory."
+  exit 1
+fi
+
+GROUPARGS=""
+USERARGS=""
+if [[ "$3" != "" ]]; then
+  GROUPARGS="--gid $3"
+  USERARGS="--uid $3"
+fi
+
+addgroup -S $GROUPARGS $1 && \
+adduser -S -D -H $USERARGS -s /sbin/nologin -g "" -h $2 -G $1 $1

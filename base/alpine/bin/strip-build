@@ -1,0 +1,56 @@
+#! /bin/sh
+
+TARGET=/usr/src/$1
+
+run() {
+  echo $@
+  $@
+}
+
+set -e
+
+apk add --no-cache --virtual .strip-build binutils
+
+# Strip docs
+echo "Stripping docs" > /dev/stderr
+for i in doc man info html sgml licenses gtk-doc ri help; do
+  if [ -d "$TARGET/usr/share/$i" ]; then
+    run rm -rf "$TARGET/usr/share/$i"
+  fi
+done
+
+# Strip dev
+echo "Stripping development files" > /dev/stderr
+for i in \
+  $TARGET/usr/include \
+  $TARGET/usr/lib/pkgconfig \
+  $TARGET/usr/share/aclocal \
+  $TARGET/usr/share/gettext \
+  $TARGET/usr/bin/*-config \
+  $TARGET/usr/share/vala/vapi \
+  $TARGET/usr/share/gir-[0-9]* \
+  $TARGET/usr/share/qt*/mkspecs \
+  $TARGET/usr/lib/qt*/mkspecs \
+  $TARGET/usr/lib/cmake \
+  $(find $TARGET -name include -type d) \
+  $(find $TARGET/usr -name '*.[acho]' -o -name '*.prl' 2>/dev/null); do
+    if [ -e "$i" ] || [ -L "$i" ]; then
+      run rm -rf $i
+    fi
+done
+
+# Strip binaries
+echo "Stripping binaries" > /dev/stderr
+scanelf --recursive --nobanner --osabi --etype "ET_DYN,ET_EXEC" $TARGET \
+  | while read type osabi filename; do
+    # scanelf may have picked up a temp file so verify that file still exists
+    [ -e "$filename" ] || continue
+    [ "$osabi" != "STANDALONE" ] || continue
+    run strip "${filename}"
+done
+
+# Remove libtool info
+echo "Removing libtool info" > /dev/stderr
+find $TARGET -name '*.la' | xargs rm -f
+
+apk del --no-network .strip-build

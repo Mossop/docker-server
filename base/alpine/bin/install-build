@@ -1,0 +1,9 @@
+#! /bin/sh
+
+TARGET=$1
+
+echo "Installing" > /dev/stderr
+
+add-deps /usr/src/$TARGET
+cp -a /usr/src/$TARGET/* /
+rm -rf /usr/src/$TARGET
