@@ -1,10 +1,6 @@
 #! /bin/sh
 
-if [[ "$1" == "" ]]; then
-  ROOTDIR=/usr
-else
-  ROOTDIR=$1
-fi
+ROOTDIR=${1:-/usr}
 
 set -e
 find $ROOTDIR >/usr/src/alllibs

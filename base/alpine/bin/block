@@ -1,9 +1,6 @@
 #! /bin/sh
 
-FILE=$1
-if [[ "$FILE" == "" ]]; then
-  FILE="/dev/null"
-fi
+FILE=${1:-/dev/null}
 
 trap 'trap - TERM; kill -1' TERM
 tail -f $FILE &

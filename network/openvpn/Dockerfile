@@ -12,7 +12,6 @@ RUN apk-begin .build-deps \
       linux-pam-dev && \
     conf-build https://swupdate.openvpn.org/community/releases/openvpn-$VERSION.tar.xz && \
     apk-end .build-deps && \
-    add-deps && \
     mkdir -p /etc/openvpn && \
     mkdir -p /var/openvpn/pid
 
