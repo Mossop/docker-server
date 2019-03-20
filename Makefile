@@ -25,4 +25,6 @@ mossop/dovecot: mossop/alpine
 
 mossop/postfix: mossop/alpine
 
+mossop/nginx: mossop/alpine
+
 mossop/nginx-php: mossop/nginx

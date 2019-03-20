@@ -1,0 +1,6 @@
+#! /bin/sh
+
+syslogd -C512
+nginx
+
+exec block-syslog

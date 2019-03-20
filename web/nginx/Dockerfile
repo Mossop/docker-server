@@ -1,11 +1,17 @@
-FROM nginx:alpine
+FROM mossop/alpine
 
-RUN rm /etc/nginx/conf.d/default.conf && \
-    mv /etc/nginx/conf.d /etc/nginx/defaults.d && \
-    mkdir /etc/nginx/conf.d && \
+RUN mkusr nginx /var/www 2201 && \
+    addgroup nginx www-data && \
+    apk-add \
+      nginx && \
+    rm /etc/nginx/conf.d/default.conf && \
     mkdir /etc/nginx/vhosts.d && \
-    sed -i -e s@/etc/nginx/conf\.d@/etc/nginx/defaults\.d@ /etc/nginx/nginx.conf
+    mkdir /run/nginx
 
-COPY defaults.d/*.conf /etc/nginx/defaults.d/
+COPY nginx.conf /etc/nginx/
+
+COPY bin/* /usr/local/bin/
 
 EXPOSE 80 443
+
+CMD ["/usr/local/bin/init"]
