@@ -3,7 +3,7 @@
 ROOTDIR=${1:-/usr}
 
 set -e
-find / >/usr/src/alllibs
+find $ROOTDIR >/usr/src/alllibs
 DEPS="$(scanelf --needed --nobanner --format '%n#p' --recursive $ROOTDIR \
   | tr ',' '\n' \
   | sort -u \

@@ -21,6 +21,8 @@ RUN mkusr nginx /var/www 2201 && \
       --conf-path=/etc/nginx/nginx.conf \
       --pid-path=/run/nginx/nginx.pid \
       --lock-path=/run/nginx/nginx.lock \
+      --error-log-path=/var/log/nginx/error.log \
+      --http-log-path=/var/log/nginx/access.log \
       --http-client-body-temp-path=/var/tmp/nginx/client_body \
       --http-proxy-temp-path=/var/tmp/nginx/proxy \
       --http-fastcgi-temp-path=/var/tmp/nginx/fastcgi \
@@ -45,6 +47,7 @@ RUN mkusr nginx /var/www 2201 && \
     mkdir -p /etc/nginx/vhosts.d && \
     mkdir -p /run/nginx && \
     mkdir -p /var/tmp/nginx && \
+    mkdir -p /var/log/nginx && \
     rm -rf /usr/local/nginx
 
 COPY nginx.conf /etc/nginx/
