@@ -3,9 +3,10 @@
 PACKAGE=$1
 URL=$2
 
+set -e
 echo "Downloading source package from $URL" > /dev/stderr
 apk add --no-cache --virtual .get-source curl
-set -ex
+set -x
 mkdir -p /usr/src/$PACKAGE
 cd /usr/src
 curl -s -o /usr/src/$PACKAGE.tar "$URL"

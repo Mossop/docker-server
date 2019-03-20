@@ -4,6 +4,7 @@ TARGET=$1
 
 echo "Installing" > /dev/stderr
 
+set -e
 add-deps /usr/src/$TARGET
 cp -a /usr/src/$TARGET/* /
 rm -rf /usr/src/$TARGET

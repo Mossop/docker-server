@@ -11,7 +11,7 @@ mossop/%:
 	@if [[ -f "$(DIR)/Makefile" ]]; then \
 	  make -C $(DIR); \
 	else \
-	  docker build $(DIR) -t $@ -t $@:latest; \
+	  docker build $(DIR) --compress --squash -t $@ -t $@:latest; \
 	fi
 	@echo ""
 
@@ -19,12 +19,14 @@ upload/%:
 	docker push $*:latest
 	@echo ""
 
+mossop/alpine-build: mossop/alpine
+
 mossop/openvpn: mossop/alpine
 
 mossop/dovecot: mossop/alpine
 
 mossop/postfix: mossop/alpine
 
-mossop/nginx: mossop/alpine
+mossop/nginx: mossop/alpine-build
 
 mossop/nginx-php: mossop/nginx

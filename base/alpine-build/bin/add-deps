@@ -3,7 +3,7 @@
 ROOTDIR=${1:-/usr}
 
 set -e
-find $ROOTDIR >/usr/src/alllibs
+find / >/usr/src/alllibs
 DEPS="$(scanelf --needed --nobanner --format '%n#p' --recursive $ROOTDIR \
   | tr ',' '\n' \
   | sort -u \
@@ -12,4 +12,4 @@ DEPS="$(scanelf --needed --nobanner --format '%n#p' --recursive $ROOTDIR \
 )"
 rm /usr/src/alllibs
 echo "Installing derived dependencies: $DEPS" > /dev/stderr
-apk add --no-cache $DEPS
+apk add -v --no-cache $DEPS

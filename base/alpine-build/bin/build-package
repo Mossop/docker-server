@@ -4,8 +4,9 @@ PACKAGE=$1
 shift
 TARGET=$1
 shift
-CONFARGS="--disable-static --prefix=/usr $@"
+CONFARGS="$@"
 
+set -e
 cd /usr/src/$PACKAGE
 
 echo "Configuring and building with arguments: $CONFARGS" > /dev/stderr

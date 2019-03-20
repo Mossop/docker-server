@@ -3,6 +3,7 @@ FROM alpine
 COPY bin/* /usr/local/bin/
 
 RUN set -ex && \
+    apk upgrade --no-cache && \
 #
 #   Configure timezone.
 #
