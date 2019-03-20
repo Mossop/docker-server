@@ -3,7 +3,4 @@
 syslogd -C512
 postfix start
 
-trap 'trap - TERM; kill -1' TERM
-logread -F &
-wait
-exit 0
+exec block-syslog

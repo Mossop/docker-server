@@ -17,5 +17,6 @@ if [[ "$3" != "" ]]; then
   USERARGS="--uid $3"
 fi
 
-addgroup -S $GROUPARGS $1 && \
-adduser -S -D -H $USERARGS -s /sbin/nologin -g "" -h $2 -G $1 $1
+set -ex
+addgroup -S $GROUPARGS $1
+adduser -S -D -H $USERARGS -s /sbin/nologin -g $1 -h $2 -G $1 $1

@@ -1,17 +1,6 @@
 FROM mossop/alpine
 
-ARG VERSION=2.4.7
-
-RUN apk-begin .build-deps \
-      gcc \
-      make \
-      libc-dev \
-      linux-headers \
-      openssl-dev \
-      lzo-dev \
-      linux-pam-dev && \
-    conf-build https://swupdate.openvpn.org/community/releases/openvpn-$VERSION.tar.xz && \
-    apk-end .build-deps && \
+RUN apk-add openvpn && \
     mkdir -p /etc/openvpn && \
     mkdir -p /var/openvpn/pid
 

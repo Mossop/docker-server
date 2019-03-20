@@ -1,22 +1,26 @@
 FROM alpine
 
-ENV CFLAGS="-Os -fomit-frame-pointer"
-ENV CXXFLAGS="-Os -fomit-frame-pointer"
-ENV CPPFLAGS="-Os -fomit-frame-pointer"
-ENV LDFLAGS="-Wl,--as-needed"
-
 COPY bin/* /usr/local/bin/
 
 RUN set -ex && \
+#
+#   Configure timezone.
+#
     apk-begin .setup \
       tzdata && \
     cp /usr/share/zoneinfo/America/Los_Angeles /etc/localtime && \
     echo "America/Los_Angeles" > /etc/timezone && \
     apk-end .setup && \
-    deluser postmaster && \
-    deluser cyrus && \
-    deluser mail && \
-    deluser postgres && \
+#
+#   Clear out existing users and groups.
+#
+    deluser postmaster 2> /dev/null && \
+    deluser cyrus 2> /dev/null && \
+    deluser mail 2> /dev/null && \
+    deluser postgres 2> /dev/null && \
+#
+#   Create shared users.
+#
     mkusr www-data /var/www/html 2001 && \
     mkusr mail /var/spool/mail 2002 && \
     mkusr vmail /var/mail/vmail 2003
