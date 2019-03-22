@@ -1,3 +1,4 @@
+# build = { "image": "mossop/php-fpm" }
 FROM php:fpm-alpine
 
 ENV EXTENSIONS="mysqli bz2 zip"

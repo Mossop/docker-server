@@ -1,3 +1,4 @@
+# build = { "image": "mossop/alpine-build" }
 FROM mossop/alpine
 
 ENV CFLAGS="-Os -fomit-frame-pointer"

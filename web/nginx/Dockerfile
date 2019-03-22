@@ -1,3 +1,4 @@
+# build = { "image": "mossop/nginx" }
 FROM mossop/alpine-build
 
 ARG VERSION=1.15.9

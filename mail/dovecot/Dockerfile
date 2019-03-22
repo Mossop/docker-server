@@ -1,3 +1,4 @@
+# build = { "image": "mossop/dovecot" }
 FROM mossop/alpine
 
 RUN mkusr dovecot /var/mail/vmail 2101 && \

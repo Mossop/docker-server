@@ -1,3 +1,4 @@
+# build = { "image": "mossop/openvpn" }
 FROM mossop/alpine
 
 RUN apk-add openvpn && \

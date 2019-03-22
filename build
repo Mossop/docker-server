@@ -1,0 +1,356 @@
+#! /usr/bin/env python
+
+import os
+import sys
+import json
+import re
+import subprocess
+import hashlib
+from tempfile import mkdtemp
+from shutil import rmtree
+
+STATE_VERSION = 1
+BASE = os.path.dirname(os.path.realpath(__file__))
+
+JSON_RE = re.compile(r"""^#\s*(\S+)\s*=\s*(\{.*\})\s*$""")
+FROM_RE = re.compile(r"""^FROM\s+(\S+)""")
+
+build_state = None
+docker = None
+tmpdir = None
+
+def normalize_image_tag(text):
+    if ":" in text:
+        return text
+    if text == "scratch":
+        return text
+    return "%s:latest" % text
+
+def get_short_id(text):
+    [_, hash] = text.split(":", 1)
+    return hash[:12]
+
+class Image(object):
+    def __init__(self, data):
+        self.data = data
+        self.id = get_short_id(data["Id"])
+
+class Docker(object):
+    def __init__(self):
+        self.images = None
+
+    def call_docker(self, args, wd = BASE):
+        result = subprocess.check_output(["docker"] + args, cwd=wd).strip()
+        if len(result) == 0:
+            return []
+        return [l.strip() for l in result.split("\n")]
+
+    def run_docker(self, args, wd = BASE):
+        subprocess.check_call(["docker"] + args, cwd=wd)
+
+    def squash(self, context, image_id):
+        lines = self.call_docker(["create", image_id])
+        container = lines[0]
+        try:
+            tmpname = os.path.join(tmpdir, "%s.tar" % image_id)
+            self.call_docker(["export", "-o", tmpname, container])
+            try:
+                lines = self.call_docker(["import", "-m", "Squashed image %s" % image_id, tmpname])
+                return get_short_id(lines[0])
+            finally:
+                os.remove(tmpname)
+        finally:
+            self.call_docker(["rm", container])
+
+    def build(self, context):
+        tmpfile = os.path.join(tmpdir, context.image_tag.replace("/", "_").replace(":", "_"))
+        path = os.path.join(BASE, context.path)
+        self.run_docker(["build", "--iidfile", tmpfile, path])
+        try:
+            with open(tmpfile) as fp:
+                built_image_id = get_short_id(fp.readline().strip())
+
+            print("Built image %s." % built_image_id)
+
+            if context.build_type == "squashed":
+                built_image_id = self.squash(context, built_image_id)
+                print("Squashed to image %s." % built_image_id)
+
+            print("Tagging %s as %s." % (built_image_id, context.image_tag))
+            self.call_docker(["tag", built_image_id, context.image_tag])
+
+            self.load_images()
+            build_state.context_built(context, self.get_image(built_image_id))
+        finally:
+            os.remove(tmpfile)
+
+    def publish(self, context):
+        self.run_docker(["push", "%s" % context.image_tag])
+        build_state.context_published(context)
+
+    def load_images(self):
+        self.images = {}
+        image_ids = self.call_docker(["image", "ls", "-a", "-q"])
+        if len(image_ids) == 0:
+            return
+        lines = self.call_docker(["image", "inspect"] + image_ids)
+        image_data = json.loads("\n".join(lines))
+        for data in image_data:
+            image = Image(data)
+            self.images[image.id] = image
+
+    def get_image(self, id):
+        if self.images is None:
+            self.load_images()
+        return self.images.get(id)
+
+class Context(object):
+    def __init__(self, path):
+        self.path = path
+        self.from_image_tag = None
+        self.meta = {}
+
+        self.checked_parent = False
+        self.found_parent = None
+
+        self.parse_dockerfile()
+        self.image_tag = normalize_image_tag(self.meta["build"]["image"])
+
+    def parse_dockerfile(self):
+        fname = os.path.join(BASE, self.path, "Dockerfile")
+        with open(fname) as fp:
+            for line in fp:
+                match = FROM_RE.match(line)
+                if match is not None:
+                    if self.from_image_tag is not None:
+                        raise Exception("Multiple build stages are not supported in %s." % fname)
+                    self.from_image_tag = normalize_image_tag(match.group(1))
+
+                match = JSON_RE.match(line)
+                if match is not None:
+                    try:
+                        name = match.group(1)
+                        obj = json.loads(match.group(2))
+
+                        self.meta[name] = obj
+                    except:
+                        pass
+
+        if "build" not in self.meta or "image" not in self.meta["build"]:
+            raise Exception("Unable to find target image in %s." % fname)
+        if self.from_image_tag is None:
+            raise Exception("Unable to find source image in %s." % fname)
+
+    def build(self):
+        if build_state.needs_build(self):
+            print("Building %s..." % self.image_tag)
+            docker.build(self)
+            print("")
+        else:
+            print("%s is up to date." % self.image_tag)
+
+    def publish(self):
+        self.build()
+        if build_state.needs_publish(self):
+            print("Publishing %s..." % self.image_tag)
+            docker.publish(self)
+            print("")
+        else:
+            print("%s is already published." % self.image_tag)
+
+    def needs(self, other):
+        if self.parent is None:
+            return False
+        if self.parent == other:
+            return True
+        return self.parent.needs(other)
+
+    @property
+    def parent(self):
+        if not self.checked_parent:
+            self.checked_parent = True
+            try:
+                self.found_parent = build_state.get_context(self.from_image_tag)
+            except:
+                pass
+
+        return self.found_parent
+
+    @property
+    def build_type(self):
+        return self.meta["build"].get("type", "normal")
+
+    def __eq__(self, other):
+        return self.path == other.path
+
+    def __ne__(self, other):
+        return self.path != other.path
+
+    def __lt__(self, other):
+        return self.__cmp__(other) < 0
+
+    def __le__(self, other):
+        return self == other or self.__lt__(other)
+
+    def __gt__(self, other):
+        return self.__cmp__(other) > 0
+
+    def __ge__(self, other):
+        return self == other or self.__gt__(other)
+
+    def __cmp__(self, other):
+        if self == other:
+            return 0
+        if self.needs(other):
+            return 1
+        if other.needs(self):
+            return -1
+        if other.path < self.path:
+            return 1
+        if self.path < other.path:
+            return -1
+        return 0
+
+class BuildState(object):
+    def __init__(self):
+        self.contexts = {}
+        self.context_images = {}
+        self.context_states = {}
+        self.image_tags = {}
+
+        self.saved_state = {
+            "version": STATE_VERSION,
+            "contexts": {},
+        }
+
+        if os.path.isfile(os.path.join(BASE, ".buildstate")):
+            with open(os.path.join(BASE, ".buildstate")) as fp:
+                loaded_state = json.load(fp)
+            if loaded_state["version"] == STATE_VERSION:
+                self.saved_state = loaded_state
+
+        current_context = None
+        hasher = None
+        for path, dirs, files in os.walk(BASE):
+            relative = os.path.relpath(path, BASE)
+            if relative == ".":
+                relative = ""
+
+            if current_context is not None and not relative.startswith(current_context.path + "/"):
+                self.add_context(current_context, hasher.hexdigest())
+                current_context = None
+                hasher = None
+
+            if current_context is None and "Dockerfile" in files:
+                current_context = Context(relative)
+                hasher = hashlib.sha256()
+
+            if current_context is not None:
+                hasher.update(path)
+                for name in sorted(files):
+                    hasher.update(name)
+                    statinfo = os.stat(os.path.join(path, name))
+                    hasher.update("%s:%d:%d:%d" % (name, statinfo.st_mode, statinfo.st_size, statinfo.st_mtime))
+
+            dirs[:] = filter(lambda d: not d.startswith("."), dirs)
+
+        if current_context is not None:
+            self.add_context(current_context, hasher.hexdigest())
+
+    def save_state(self):
+        with open(os.path.join(BASE, ".buildstate"), "w") as fp:
+            json.dump(self.saved_state, fp, indent=2)
+
+    def add_context(self, context, newhash):
+        self.contexts[context.path] = context
+
+        state = self.saved_state["contexts"].setdefault(context.path, {
+            "hash": newhash,
+            "image": None,
+            "parent_image": None,
+            "published": None,
+        })
+        if state["hash"] != newhash:
+            state["hash"] = newhash
+            state["image"] = None
+
+        self.context_states[context] = state
+        self.image_tags[context.image_tag] = context
+        if state["image"] is not None:
+            self.context_images[context] = docker.get_image(state["image"])
+        else:
+            self.context_images[context] = None
+
+    def get_context(self, image_tag):
+        if image_tag in self.image_tags:
+            return self.image_tags[image_tag]
+        raise Exception("Could not find context for %s." % image_tag)
+
+    def needs_build(self, context):
+        if self.context_images[context] is None:
+            return True
+        if context.parent is not None:
+            return self.context_states[context]["parent_image"] != self.context_images[context.parent].id
+        return False
+
+    def needs_publish(self, context):
+        return self.context_states[context]["published"] != self.context_images[context].id
+
+    def context_built(self, context, image):
+        self.context_images[context] = image
+        self.context_states[context]["image"] = image.id
+        if context.parent is not None:
+            self.context_states[context]["parent_image"] = self.context_images[context.parent].id
+        self.save_state()
+
+    def context_published(self, context):
+        self.context_states[context]["published"] = self.context_images[context].id
+        self.save_state()
+
+docker = Docker()
+build_state = BuildState()
+
+def build_context_list(args):
+    if len(args) == 0:
+        contexts = set(build_state.contexts.values())
+    else:
+        contexts = set()
+        for imagetag in args:
+            requested = build_state.get_context(normalize_image_tag(imagetag))
+            contexts.add(requested)
+            context = requested.parent
+            while context is not None:
+                if context == requested:
+                    raise Exception("Detected cyclic dependencies starting from %s" % requested.image_tag)
+                if context in contexts:
+                    break
+                contexts.add(context)
+                context = context.parent
+
+    return sorted(contexts)
+
+def publish(args):
+    publish_list = build_context_list(args)
+    for context in publish_list:
+        context.publish()
+
+def build(args):
+    build_list = build_context_list(args)
+    for context in build_list:
+        context.build()
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+
+    tmpdir = mkdtemp()
+    try:
+        if len(args) == 0:
+            build(args)
+        elif args[0] == "publish":
+            publish(args[1:])
+        elif args[0] == "build":
+            build(args[1:])
+        else:
+            build(args)
+    finally:
+        rmtree(tmpdir)

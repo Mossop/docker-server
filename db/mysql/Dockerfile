@@ -1,3 +1,4 @@
+# build = { "image": "mossop/mysql" }
 FROM mysql
 
 RUN mv /etc/mysql/conf.d /etc/mysql/defaults.d && \
