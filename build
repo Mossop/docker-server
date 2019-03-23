@@ -12,8 +12,7 @@ from shutil import rmtree
 STATE_VERSION = 1
 BASE = os.path.dirname(os.path.realpath(__file__))
 
-JSON_RE = re.compile(r"""^#\s*(\S+)\s*=\s*(\{.*\})\s*$""")
-FROM_RE = re.compile(r"""^FROM\s+(\S+)""")
+SQUASH_INSTRUCTIONS = ["CMD", "ENTRYPOINT", "ENV", "EXPOSE", "ONBUILD", "USER", "VOLUME", "WORKDIR"]
 
 build_state = None
 docker = None
@@ -29,6 +28,101 @@ def normalize_image_tag(text):
 def get_short_id(text):
     [_, hash] = text.split(":", 1)
     return hash[:12]
+
+DIRECTIVE_RE = re.compile(r"""#\s*(\S+)\s*=\s*(.+)$""")
+INSTRUCTION_RE = re.compile(r"""(\S+)\s*(.+)$""")
+class DockerFileParser(object):
+    def __init__(self, dockerfile):
+        self.allow_directives = True
+        self.line = 0
+        self.current_instruction = None
+        self.dockerfile = dockerfile
+
+    def add_to_current_instruction(self, text):
+        if text[-1] == "\\" and text[-2] != "\\":
+            self.current_instruction["value"] += text[:-1]
+        else:
+            self.current_instruction["value"] += text
+            self.dockerfile.append_instruction(self.current_instruction["name"], self.current_instruction["value"])
+            self.current_instruction = None
+
+    def parse_line(self, line):
+        self.line += 1
+
+        if line[-1] == "\n":
+            line = line[:-1]
+
+        if len(line) > 0 and line[0] == "#":
+            if self.allow_directives:
+                match = DIRECTIVE_RE.match(line)
+                if match is not None:
+                    self.dockerfile.append_directive(match.group(1), match.group(2))
+                    return
+            self.allow_directives = False
+            return
+
+        if len(line) == 0:
+            self.allow_directives = False
+            return
+
+        if self.current_instruction is not None:
+            self.add_to_current_instruction(line)
+            return
+
+        match = INSTRUCTION_RE.match(line)
+        if match is not None:
+            self.current_instruction = {
+                "name": match.group(1),
+                "value": "",
+            }
+            self.add_to_current_instruction(match.group(2))
+            self.allow_directives = False
+            return
+
+        raise Exception("Unexpected Dockerfile syntax at line %d:\n\"%s\"" % (self.line, line))
+
+class DockerFile(object):
+    def __init__(self, path):
+        parser = DockerFileParser(self)
+
+        self.directives = {}
+        self.instructions = []
+        self.from_image_tag = None
+        self.meta = {}
+
+        with open(path) as fp:
+            for line in fp:
+                parser.parse_line(line)
+        if self.from_image_tag is None:
+            raise Exception("Unable to find source image in %s." % path)
+
+    def get_meta(self, args, default = None):
+        indexes = list(args)
+        meta = self.meta
+        while len(indexes) > 0:
+            index = indexes.pop(0)
+            if index not in meta:
+                return default
+            meta = meta[index]
+        return meta
+
+    def append_directive(self, name, value):
+        self.directives[name] = value
+        if value[0] == "{" and value[-1] == "}":
+            try:
+                self.meta[name] = json.loads(value)
+            except:
+                pass
+
+    def append_instruction(self, name, value):
+        name = name.upper()
+        self.instructions.append([name, value])
+        if name == "FROM":
+            space = value.find(" ")
+            if space == -1:
+                self.from_image_tag = value
+            else:
+                self.from_image_tag = value[0:space]
 
 class Image(object):
     def __init__(self, data):
@@ -49,13 +143,20 @@ class Docker(object):
         subprocess.check_call(["docker"] + args, cwd=wd)
 
     def squash(self, context, image_id):
+        instructions = filter(lambda i: i[0] in SQUASH_INSTRUCTIONS, context.dockerfile.instructions)
+        instructions = map(lambda i: " ".join(i), instructions)
+
+        args = []
+        for i in instructions:
+            args += ["-c", i]
+
         lines = self.call_docker(["create", image_id])
         container = lines[0]
         try:
             tmpname = os.path.join(tmpdir, "%s.tar" % image_id)
             self.call_docker(["export", "-o", tmpname, container])
             try:
-                lines = self.call_docker(["import", "-m", "Squashed image %s" % image_id, tmpname])
+                lines = self.call_docker(["import", "-m", "Squashed image %s" % image_id] + args + [tmpname])
                 return get_short_id(lines[0])
             finally:
                 os.remove(tmpname)
@@ -107,39 +208,14 @@ class Docker(object):
 class Context(object):
     def __init__(self, path):
         self.path = path
-        self.from_image_tag = None
-        self.meta = {}
 
         self.checked_parent = False
         self.found_parent = None
 
-        self.parse_dockerfile()
-        self.image_tag = normalize_image_tag(self.meta["build"]["image"])
-
-    def parse_dockerfile(self):
-        fname = os.path.join(BASE, self.path, "Dockerfile")
-        with open(fname) as fp:
-            for line in fp:
-                match = FROM_RE.match(line)
-                if match is not None:
-                    if self.from_image_tag is not None:
-                        raise Exception("Multiple build stages are not supported in %s." % fname)
-                    self.from_image_tag = normalize_image_tag(match.group(1))
-
-                match = JSON_RE.match(line)
-                if match is not None:
-                    try:
-                        name = match.group(1)
-                        obj = json.loads(match.group(2))
-
-                        self.meta[name] = obj
-                    except:
-                        pass
-
-        if "build" not in self.meta or "image" not in self.meta["build"]:
-            raise Exception("Unable to find target image in %s." % fname)
-        if self.from_image_tag is None:
-            raise Exception("Unable to find source image in %s." % fname)
+        dockerpath = os.path.join(path, "Dockerfile")
+        self.dockerfile = DockerFile(dockerpath)
+        if self.dockerfile.get_meta(["build", "image"]) is None:
+            raise Exception("Unable to find target image in %s." % dockerpath)
 
     def build(self):
         if build_state.needs_build(self):
@@ -177,8 +253,16 @@ class Context(object):
         return self.found_parent
 
     @property
+    def image_tag(self):
+        return normalize_image_tag(self.dockerfile.get_meta(["build", "image"]))
+
+    @property
+    def from_image_tag(self):
+        return self.dockerfile.from_image_tag
+
+    @property
     def build_type(self):
-        return self.meta["build"].get("type", "normal")
+        return self.dockerfile.get_meta(["build", "type"], "normal")
 
     def __eq__(self, other):
         return self.path == other.path

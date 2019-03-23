@@ -26,3 +26,5 @@ RUN set -ex && \
     mkusr www-data /var/www/html 2001 && \
     mkusr mail /var/spool/mail 2002 && \
     mkusr vmail /var/mail/vmail 2003
+
+CMD ["/bin/sh"]
