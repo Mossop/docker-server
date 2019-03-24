@@ -1,0 +1,4 @@
+#! /bin/sh
+
+cd /var/lib/redis
+su-exec redis:redis redis-server

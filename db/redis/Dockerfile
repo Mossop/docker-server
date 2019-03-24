@@ -3,7 +3,8 @@ FROM mossop/alpine-build
 
 ARG VERSION=5.0.4
 
-RUN mkusr nginx /var/www 2301 && \
+RUN mkusr redis /var/lib/redis 2301 && \
+    apk-add su-exec && \
     apk-begin .builddeps \
       coreutils \
       make \
@@ -21,10 +22,14 @@ RUN mkusr nginx /var/www 2301 && \
     set +x && \
     strip-build build && \
     install-build build && \
-    apk-end .builddeps
+    apk-end .builddeps && \
+    mkdir -p /var/lib/redis && \
+    chown redis:redis /var/lib/redis
 
 COPY redis.conf /etc/redis.conf
 
+COPY bin/* /usr/local/bin/
+
 EXPOSE 6379
 
-CMD ["redis-server"]
+CMD ["/usr/local/bin/init"]
