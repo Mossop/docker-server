@@ -1,4 +1,3 @@
 #! /bin/sh
 
-cd /var/lib/redis
-exec su-exec redis:redis redis-server
+exec su-exec redis:redis redis-server /etc/redis.conf
