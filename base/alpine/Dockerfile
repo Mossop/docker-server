@@ -1,5 +1,5 @@
 # build = { "image": "mossop/alpine", "type": "squashed" }
-FROM alpine
+FROM alpine:3.10.3
 
 COPY bin/* /usr/local/bin/
 

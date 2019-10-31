@@ -1,5 +1,5 @@
 # build = { "image": "mossop/mysql" }
-FROM mysql
+FROM mysql:8.0.18
 
 RUN mv /etc/mysql/conf.d /etc/mysql/defaults.d && \
     mkdir /etc/mysql/conf.d && \

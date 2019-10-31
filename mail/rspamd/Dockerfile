@@ -1,7 +1,7 @@
 # build = { "image": "mossop/rspamd" }
 FROM mossop/alpine-build
 
-ARG VERSION=1.9.0
+ARG VERSION=2.1
 
 RUN mkdir -p /var/lib/rspamd && \
     mkusr rspamd /var/lib/rspamd 2501 && \
@@ -12,6 +12,7 @@ RUN mkdir -p /var/lib/rspamd && \
       make \
       cmake \
       gcc \
+      g++ \
       linux-headers \
       pkgconf \
       musl-dev \
@@ -22,6 +23,7 @@ RUN mkdir -p /var/lib/rspamd && \
       libevent-dev \
       sqlite-dev \
       icu-dev \
+      libsodium-dev \
       openssl-dev \
       file-dev && \
     cd /usr/src && \

@@ -1,7 +1,7 @@
 # build = { "image": "mossop/php-fpm" }
 FROM mossop/alpine-build
 
-ARG VERSION=7.3.3
+ARG VERSION=7.3.11
 
 ENV PHPCFLAGS="-fstack-protector-strong -fpic -fpie"
 ENV PHPLDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
