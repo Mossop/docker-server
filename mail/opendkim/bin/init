@@ -1,0 +1,6 @@
+#! /bin/sh
+
+syslogd -C512
+opendkim -x /etc/opendkim/opendkim.conf
+
+exec block-syslog
