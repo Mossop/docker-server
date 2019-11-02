@@ -1,0 +1,9 @@
+#! /bin/sh
+
+if [ ! -f "$SRS_SECRET" ]; then
+  dd if=/dev/urandom bs=18 count=1 | base64 > $SRS_SECRET
+fi
+
+postsrsd -f "$SRS_FORWARD_PORT" -r "$SRS_REVERSE_PORT" -d "$SRS_DOMAIN" \
+  -s "$SRS_SECRET" -a "$SRS_SEPARATOR" -n "$SRS_HASHLENGTH" -N "$SRS_HASHMIN" \
+  -u "$RUN_AS" -c "$CHROOT" -l "$SRS_LISTEN_ADDR" -X"$SRS_EXCLUDE_DOMAINS"
