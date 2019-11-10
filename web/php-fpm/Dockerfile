@@ -13,6 +13,7 @@ RUN CFLAGS="$PHPCFLAGS $CFLAGS" \
     addgroup php www-data && \
     mkdir -p /etc/php/conf.d && \
     apk-begin .builddeps \
+      autoconf \
       curl \
       coreutils \
       make \
@@ -27,13 +28,18 @@ RUN CFLAGS="$PHPCFLAGS $CFLAGS" \
       libedit-dev \
       libsodium-dev \
       argon2-dev \
-      libzip-dev && \
+      libzip-dev \
+      libwebp-dev \
+      jpeg-dev \
+      libpng-dev \
+      libxpm-dev && \
     set -e && \
     mkdir -p /usr/src/php && \
     curl -L -s "https://secure.php.net/get/php-$VERSION.tar.xz/from/this/mirror" | \
       tar -xJf - -C /usr/src/php --strip-components=1 && \
     cd /usr/src/php && \
     ./configure \
+      --prefix=/usr \
       --sysconfdir=/etc \
       --with-config-file-path="/etc/php" \
       --with-config-file-scan-dir="/etc/php/conf.d" \
@@ -51,6 +57,8 @@ RUN CFLAGS="$PHPCFLAGS $CFLAGS" \
       --with-libedit \
       --with-openssl \
       --with-zlib \
+      --with-gd \
+      --enable-pcntl \
       --enable-fpm \
       --with-fpm-user=php \
       --with-fpm-group=www-data \
@@ -58,10 +66,13 @@ RUN CFLAGS="$PHPCFLAGS $CFLAGS" \
     make && \
     mkdir -p /usr/src/build && \
     make INSTALL_ROOT=/usr/src/build install && \
+    cp -a /usr/src/build/usr/include/php /usr/include/php && \
+    cp /usr/src/build/usr/bin/php-config /usr/bin/php-config && \
     strip-build build && \
     install-build build && \
+    cp /usr/src/php/php.ini-production /etc/php && \
+    pecl channel-update pecl.php.net && \
     apk-end .builddeps && \
-    cp /usr/src/php/php.ini-* /etc/php && \
     mv /etc/php-fpm.d/www.conf.default /etc/php-fpm.d/www.conf && \
     mv /etc/php-fpm.conf.default /etc/php-fpm.conf && \
     rm -rf /usr/src/php
