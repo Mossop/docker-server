@@ -32,7 +32,10 @@ RUN CFLAGS="$PHPCFLAGS $CFLAGS" \
       libwebp-dev \
       jpeg-dev \
       libpng-dev \
-      libxpm-dev && \
+      libxpm-dev \
+      re2c \
+      bison \
+      freetype-dev && \
     set -e && \
     mkdir -p /usr/src/php && \
     curl -L -s "https://secure.php.net/get/php-$VERSION.tar.xz/from/this/mirror" | \
@@ -58,6 +61,12 @@ RUN CFLAGS="$PHPCFLAGS $CFLAGS" \
       --with-openssl \
       --with-zlib \
       --with-gd \
+      --with-webp-dir=/usr/include \
+      --with-jpeg-dir=/usr/include \
+      --with-png-dir=/usr/include \
+      --with-zlib-dir=/usr/include \
+      --with-xpm-dir=/usr/include \
+      --with-freetype-dir=/usr/include \
       --enable-pcntl \
       --enable-fpm \
       --with-fpm-user=php \
@@ -70,12 +79,14 @@ RUN CFLAGS="$PHPCFLAGS $CFLAGS" \
     cp /usr/src/build/usr/bin/php-config /usr/bin/php-config && \
     strip-build build && \
     install-build build && \
-    cp /usr/src/php/php.ini-production /etc/php && \
+    cp /usr/src/php/php.ini-production /etc/php/php.ini && \
     pecl channel-update pecl.php.net && \
     apk-end .builddeps && \
     mv /etc/php-fpm.d/www.conf.default /etc/php-fpm.d/www.conf && \
     mv /etc/php-fpm.conf.default /etc/php-fpm.conf && \
-    rm -rf /usr/src/php
+    rm -rf /usr/src/php && \
+    echo "zend_extension=opcache.so" >>/etc/php/php.ini && \
+    echo "opcache.enabled=1" >> /etc/php/php.ini
 
 COPY etc/php-fpm.d/* /etc/php-fpm.d/
 

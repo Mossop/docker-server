@@ -1,0 +1,6 @@
+#! /bin/sh
+
+if [ -f "/phabricator/phabricator/conf/local/local.json" ]; then
+  /phabricator/phabricator/bin/phd start
+fi
+php-fpm
