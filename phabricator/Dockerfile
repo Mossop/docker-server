@@ -4,6 +4,8 @@ FROM mossop/php-fpm
 ARG GITVERSION=2.24.0
 ARG PYTHONVERSION=2.7.17
 
+COPY bin/* /usr/local/bin/
+
 RUN apk-add \
       openssh-client \
       ncurses \
@@ -57,21 +59,28 @@ RUN apk-add \
     pip install mercurial hg-evolve Pygments && \
     pecl install apcu && \
     echo "extension=apcu.so" >>/etc/php/php.ini && \
-    apk-end .builddeps
+    apk-end .builddeps && \
+    mkdir -p /etc/ssh/keys /repositories /storage /phabricator && \
+    mkusr phab-daemon /repositories 2410 && \
+    addgroup -S --gid 2420 phabricator && \
+    adduser -S -D -H --uid 2420 -s /bin/sh -g phabricator -h /repositories -G phabricator phabricator && \
+    sed -i 's/phabricator:!:/phabricator:NP:/' /etc/shadow && \
+    chown -R php:php . /storage && \
+    chown -R phab-daemon:phab-daemon /repositories && \
+    apk-add \
+      openssh-server \
+      sudo
 
-RUN mkdir /phabricator && \
-    cd /phabricator && \
+COPY sudoers /etc/sudoers.d/phabricator
+COPY sshd_config /etc/ssh/
+
+RUN cd /phabricator && \
     git clone -b stable --progress https://github.com/phacility/libphutil.git && \
     git clone -b stable --progress https://github.com/phacility/arcanist.git && \
-    git clone -b stable --progress https://github.com/phacility/phabricator.git && \
-    mkdir -p /repositories && \
-    mkdir -p /storage && \
-    chown -R php:php . /repositories /storage
+    git clone -b stable --progress https://github.com/phacility/phabricator.git
 
 ENV PATH="/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/phabricator/phabricator/bin"
 
 WORKDIR /phabricator/phabricator
-
-COPY bin/* /usr/local/bin/
 
 CMD ["/usr/local/bin/init"]
