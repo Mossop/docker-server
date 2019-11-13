@@ -60,7 +60,7 @@ RUN apk-add \
     pecl install apcu && \
     echo "extension=apcu.so" >>/etc/php/php.ini && \
     apk-end .builddeps && \
-    mkdir -p /etc/ssh/keys /repositories /storage /phabricator && \
+    mkdir -p /etc/mercurial/hgrc.d /etc/ssh/keys /repositories /storage /phabricator && \
     mkusr phab-daemon /repositories 2410 && \
     addgroup -S --gid 2420 phabricator && \
     adduser -S -D -H --uid 2420 -s /bin/sh -g phabricator -h /repositories -G phabricator phabricator && \
