@@ -1,0 +1,34 @@
+#! /bin/sh
+
+VERSION=2.7.17
+
+set -e
+apk-begin .builddeps \
+  autoconf \
+  coreutils \
+  make \
+  gcc \
+  linux-headers \
+  pkgconf \
+  musl-dev \
+  curl \
+  db-dev \
+  ncurses-dev \
+  openssl-dev \
+  tcl-dev \
+  tk-dev \
+  bzip2-dev \
+  gdbm-dev \
+  readline-dev
+
+get-source python https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tar.xz
+build-package python build \
+  --prefix=/usr
+cp -R /usr/src/build/usr/include/python2.7 /usr/include/python2.7
+strip-build build
+install-build build
+rm -rf /usr/src/python
+cd /usr/src
+curl -L -s https://bootstrap.pypa.io/get-pip.py | python -
+
+apk-end .builddeps
