@@ -5,6 +5,11 @@ COPY bin/* /usr/local/bin/
 
 RUN set -ex && \
     apk upgrade --no-cache && \
+    apk add runit && \
+    mkdir -p /init/services /etc/runit && \
+    ln -s /init/startup /etc/runit/1 && \
+    ln -s /init/run /etc/runit/2 && \
+    ln -s /init/shutdown /etc/runit/3 && \
 #
 #   Configure timezone.
 #
@@ -26,5 +31,7 @@ RUN set -ex && \
     mkusr www-data /var/www/html 2001 && \
     mkusr mail /var/spool/mail 2002 && \
     mkusr vmail /var/mail/vmail 2003
+
+COPY init/* /init/
 
 CMD ["/bin/sh"]

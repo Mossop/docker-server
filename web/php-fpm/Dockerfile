@@ -14,7 +14,6 @@ RUN CFLAGS="$PHPCFLAGS $CFLAGS" \
     mkdir -p /etc/php/conf.d && \
     apk-begin .builddeps \
       autoconf \
-      curl \
       coreutils \
       make \
       gcc \

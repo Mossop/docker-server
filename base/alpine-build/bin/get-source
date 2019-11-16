@@ -9,7 +9,7 @@ apk add --no-cache --virtual .get-source curl
 set -x
 mkdir -p /usr/src/$PACKAGE
 cd /usr/src
-curl -L -s -o /usr/src/$PACKAGE.tar "$URL"
+download -o $PACKAGE.tar "$URL"
 tar -xf /usr/src/$PACKAGE.tar -C /usr/src/$PACKAGE --strip-components=1
 rm /usr/src/$PACKAGE.tar
 apk del --no-network .get-source

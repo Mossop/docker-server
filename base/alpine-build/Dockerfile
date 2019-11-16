@@ -6,7 +6,10 @@ ENV CXXFLAGS="-Os -fomit-frame-pointer"
 ENV CPPFLAGS="-Os -fomit-frame-pointer"
 ENV LDFLAGS="-Wl,--as-needed"
 
-RUN mkdir -p /usr/src/installers
+RUN mkdir -p /usr/src/installers && \
+    apk-add \
+      curl \
+      aria2
 
 COPY bin/* /usr/local/bin/
 COPY installers/* /usr/src/installers/

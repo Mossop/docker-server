@@ -1,0 +1,15 @@
+#! /bin/sh
+
+if [ -f "/init/environment" ]; then
+  . /init/environment
+fi
+
+if [ -f "/init/startup" ]; then
+  /init/startup
+fi
+
+/init/run
+
+if [ -f "/init/shutdown" ]; then
+  /init/shutdown
+fi

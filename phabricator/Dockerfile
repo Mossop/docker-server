@@ -12,7 +12,6 @@ RUN apk-add \
       procps && \
     apk-begin .builddeps \
       autoconf \
-      curl \
       coreutils \
       make \
       gcc \

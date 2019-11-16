@@ -7,11 +7,10 @@ apk-begin .builddeps \
   musl-dev \
   gcc \
   gettext-dev \
-  libintl \
-  curl
+  libintl
 
 cd /usr/src
-curl -L -o musl-locales.zip https://github.com/rilian-la-te/musl-locales/archive/master.zip
+download -o musl-locales.zip https://github.com/rilian-la-te/musl-locales/archive/master.zip
 unzip musl-locales.zip
 cd musl-locales-master
 cmake .
