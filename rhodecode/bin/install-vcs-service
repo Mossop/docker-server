@@ -1,0 +1,19 @@
+#! /bin/sh
+
+TARGET=/rhodecode/services/vcsserver
+
+mkdir -p ${TARGET}
+
+for file in /rhodecode/.rccontrol/cache/RhodeCodeVCSServer-*; do
+  if [ -L "${file}" ]; then
+    ln -s ${file} ${TARGET}/profile
+  fi
+done
+
+cp ${TARGET}/profile/etc/production.ini ${TARGET}/vcsserver.ini
+change-ini-value ${TARGET}/vcsserver.ini "core.binary_dir" '""'
+change-ini-value ${TARGET}/vcsserver.ini "proc_name" "rhodecode_vcsserver"
+
+cp /rhodecode/.rccontrol-profile/lib/python2.7/site-packages/rccontrol/lib/configs/gunicorn_config.py.tmpl ${TARGET}/gunicorn_config.py
+
+echo ${VCSSERVER_VERSION} > ${TARGET}/.version

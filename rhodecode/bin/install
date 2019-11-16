@@ -1,0 +1,14 @@
+#! /bin/sh
+
+set -e
+
+URL=$1
+FILE=`echo ${URL} | sed -E -e "s|^.*/||"`
+LINK=`echo ${FILE} | sed -E -e "s|(.*)\.tar\.bz2|\1|"`
+CACHE=/rhodecode/.rccontrol/cache
+
+aria2c -d ${CACHE} -j 10 $URL
+cd /opt/rhodecode
+tar -xf ${CACHE}/${FILE} --overwrite --group=rhodecode --owner=rhodecode --strip-components=1
+ln -s `cat install_path` ${CACHE}/${LINK}
+rm install_path store_paths ${CACHE}/${FILE}

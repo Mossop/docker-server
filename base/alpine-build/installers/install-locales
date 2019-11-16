@@ -1,0 +1,26 @@
+#! /bin/sh
+
+set -e
+apk-begin .builddeps \
+  cmake \
+  make \
+  musl-dev \
+  gcc \
+  gettext-dev \
+  libintl \
+  curl
+
+cd /usr/src
+curl -L -o musl-locales.zip https://github.com/rilian-la-te/musl-locales/archive/master.zip
+unzip musl-locales.zip
+cd musl-locales-master
+cmake .
+make
+mkdir /usr/src/build
+make DESTDIR=/usr/src/build install
+strip-build build
+install-build build
+cd /usr/src
+rm -rf /usr/src/musl-locales-master /usr/src/build /usr/src/musl-locales.zip
+
+apk-end .builddeps
