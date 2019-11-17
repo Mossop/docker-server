@@ -52,9 +52,8 @@ RUN mkusr nginx /var/www 2201 && \
     rm -rf /usr/local/nginx
 
 COPY nginx.conf /etc/nginx/
-
-COPY bin/* /usr/local/bin/
+COPY init /init/
 
 EXPOSE 80 443
 
-CMD ["/usr/local/bin/init"]
+CMD ["/init/init"]
