@@ -3,6 +3,8 @@ FROM mossop/alpine-build
 
 ARG VERSION=9.14.7
 
+COPY init /init/
+
 RUN mkusr named /etc/named 2701 && \
     apk-begin .builddeps \
       coreutils \
@@ -23,4 +25,4 @@ RUN mkusr named /etc/named 2701 && \
 
 EXPOSE 53
 
-CMD ["named", "-c", "/etc/named/named.conf", "-g", "-u", "named"]
+CMD ["/init/init"]
