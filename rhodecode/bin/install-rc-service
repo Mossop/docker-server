@@ -2,11 +2,11 @@
 
 TARGET=/rhodecode/services/community
 
-mkdir -p ${TARGET}
-ln -s /rhodecode/cache/community ${TARGET}/profile
+mkdir -p ${TARGET}/data
+chown rhodecode:rhodecode -R ${TARGET}
 
 mkdir ${TARGET}/custom_modules
-mkdir ${TARGET}/data
+ln -s `readlink /rhodecode/cache/community` ${TARGET}/profile
 ln -s ${TARGET}/profile/lib/python2.7/site-packages/rhodecode/public ${TARGET}/public
 ln -s ${TARGET}/profile/lib/python2.7/site-packages/rhodecode/public ${TARGET}/static
 cp /rhodecode/profile/lib/python2.7/site-packages/rccontrol/lib/configs/rhodecode400_mapping.ini.tmpl ${TARGET}/search_mapping.ini

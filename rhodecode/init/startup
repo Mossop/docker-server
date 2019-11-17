@@ -1,6 +1,8 @@
 #! /bin/sh
 
 mkdir -p /rhodecode/services
+mkdir -p /rhodecode/repos
+chown rhodecode:rhodecode /rhodecode/repos
 
 if [ ! -f "/rhodecode/services/vcsserver/vcsserver.ini" ]; then
   install-vcs-service

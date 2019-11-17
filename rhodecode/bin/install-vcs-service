@@ -3,7 +3,8 @@
 TARGET=/rhodecode/services/vcsserver
 
 mkdir -p ${TARGET}
-ln -s /rhodecode/cache/vcsserver ${TARGET}/profile
+chown rhodecode:rhodecode ${TARGET}
+ln -s `readlink /rhodecode/cache/vcsserver` ${TARGET}/profile
 
 cp ${TARGET}/profile/etc/production.ini ${TARGET}/vcsserver.ini
 change-ini-value ${TARGET}/vcsserver.ini "core.binary_dir" '""'
