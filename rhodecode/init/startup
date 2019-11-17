@@ -1,0 +1,19 @@
+#! /bin/sh
+
+mkdir -p /rhodecode/services
+
+if [ ! -f "/rhodecode/services/vcsserver/vcsserver.ini" ]; then
+  install-vcs-service
+fi
+
+if [ ! -f "/rhodecode/services/community/rhodecode.ini" ]; then
+  install-rc-service
+fi
+
+if [ ! -f "/rhodecode/services/ssh/ssh_host_rsa_key" ]; then
+  mkdir -p /rhodecode/services/ssh
+  ssh-keygen -f /rhodecode/services/ssh/ssh_host_rsa_key -N '' -t rsa
+  ssh-keygen -f /rhodecode/services/ssh/ssh_host_dsa_key -N '' -t dsa
+  ssh-keygen -f /rhodecode/services/ssh/ssh_host_ecdsa_key -N '' -t ecdsa
+  ssh-keygen -f /rhodecode/services/ssh/ssh_host_ed25519_key -N '' -t ed25519
+fi

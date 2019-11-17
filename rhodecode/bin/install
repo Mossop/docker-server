@@ -2,13 +2,18 @@
 
 set -e
 
-URL=$1
-FILE=`echo ${URL} | sed -E -e "s|^.*/||"`
-LINK=`echo ${FILE} | sed -E -e "s|(.*)\.tar\.bz2|\1|"`
-CACHE=/rhodecode/.rccontrol/cache
+CACHE=/rhodecode/cache
 
-aria2c -d ${CACHE} -j 10 $URL
+URL=`cat ${CACHE}/MANIFEST | \
+      sed -E -e "s/.+ //" | \
+      grep $1`
+
+FILE=`echo ${URL} | sed -E -e "s|^.*/||"`
+LINK=$2
+
+aria2c -d ${CACHE} -o ${FILE} -j 10 $URL
 cd /opt/rhodecode
-tar -xf ${CACHE}/${FILE} --overwrite --group=rhodecode --owner=rhodecode --strip-components=1
-ln -s `cat install_path` ${CACHE}/${LINK}
-rm install_path store_paths ${CACHE}/${FILE}
+tar -xf ${CACHE}/${FILE}
+mv -n APP/store/* store
+ln -s `cat APP/install_path` ${CACHE}/${LINK}
+rm -rf APP ${CACHE}/${FILE}

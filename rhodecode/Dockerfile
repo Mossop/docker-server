@@ -1,47 +1,37 @@
 # build = { "image": "mossop/rhodecode" }
 FROM mossop/alpine-build
 
+ARG RCCONTROL_VERSION=1.23.3
 ENV VCSSERVER_VERSION=4.17.4
 ENV COMMUNITY_VERSION=4.17.4
-ARG RCCONTROL_VERSION=NzA2MjdhN2E2ODYxNzY2NzZjNDA2NTc1NjI3MTcyNzA2MjcxNzIyZTcwNjI3YQ==
 
 COPY bin/* /usr/local/bin/
 
-RUN /usr/src/installers/install-locales && \
-    /usr/src/installers/install-python2 && \
-    mkdir -p /opt/rhodecode /rhodecode && \
-    mkusr rhodecode /rhodecode 2500 && \
-    chown -R rhodecode:rhodecode /opt/rhodecode /rhodecode /usr/src && \
-    echo "Cmnd_Alias GUNICORN = /rhodecode/services/vcsserver/profile/bin/gunicorn, /rhodecode/services/community/profile/bin/gunicorn" > /etc/sudoers && \
-    echo "rhodecode ALL=(ALL) NOPASSWD: GUNICORN" >> /etc/sudoers && \
-    apk-add \
-      curl \
+RUN apk-add \
       sudo \
-      aria2 \
-      tar
+      openssh-server && \
+    /usr/src/installers/install-locales && \
+    /usr/src/installers/install-python2 && \
+    mkdir -p /opt/rhodecode/store /rhodecode/cache /rhodecode/repos /rhodecode/.ssh /rhodecode/services/ssh && \
+    mkusr rhodecode /rhodecode 2500 && \
+    passwd -u rhodecode && \
+    sed -E -e s@:/rhodecode:/sbin/nologin@:/rhodecode:/bin/sh@ -i /etc/passwd && \
+    chown rhodecode:rhodecode /rhodecode/repos /rhodecode/.ssh /rhodecode/services && \
+    download -d /rhodecode/cache -o MANIFEST https://dls.rhodecode.com/linux/MANIFEST && \
+    install RhodeCodeControl-${RCCONTROL_VERSION}+x86_64-linux control && \
+    install RhodeCodeVCSServer-${VCSSERVER_VERSION}+x86_64-linux vcsserver && \
+    install RhodeCodeCommunity-${COMMUNITY_VERSION}+x86_64-linux community && \
+    ln -s `readlink /rhodecode/cache/control` /rhodecode/profile && \
+    rm -rf /usr/src/*
+
+COPY sudoers /etc/sudoers
+COPY sshd_config /etc/ssh/
+COPY init /init/
 
 ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     MUSL_LOCPATH=/usr/local/share/i18n/locales/musl
-USER rhodecode
 WORKDIR /rhodecode
 
-RUN mkdir -p /rhodecode/.rccontrol/cache /rhodecode/repos && \
-    aria2c -d /rhodecode/.rccontrol/cache https://dls.rhodecode.com/linux/MANIFEST && \
-    cd /usr/src && \
-    curl -L -O -J https://dls-eu.rhodecode.com/dls/${RCCONTROL_VERSION}/rhodecode-control/latest-linux-ce && \
-    chmod 755 /usr/src/RhodeCode-installer-* && \
-    cd /rhodecode && \
-    /usr/src/RhodeCode-installer-* --accept-license --create-install-directory && \
-    cat /rhodecode/.rccontrol/cache/MANIFEST | \
-      sed -E -e "s/.+ //" | \
-      grep RhodeCodeVCSServer-${VCSSERVER_VERSION}+x86_64-linux | \
-      xargs install && \
-    cat /rhodecode/.rccontrol/cache/MANIFEST | \
-      sed -E -e "s/.+ //" | \
-      grep RhodeCodeCommunity-${COMMUNITY_VERSION}+x86_64-linux | \
-      xargs install && \
-    rm -rf /usr/src/*
-
-CMD ["/usr/local/bin/init"]
+CMD ["/init/init"]

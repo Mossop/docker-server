@@ -1,0 +1,3 @@
+Cmnd_Alias GUNICORN = /rhodecode/services/vcsserver/profile/bin/gunicorn, /rhodecode/services/community/profile/bin/gunicorn
+
+rhodecode ALL=(ALL) NOPASSWD: GUNICORN
