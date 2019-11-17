@@ -1,2 +1,0 @@
-php ALL=(phab-daemon) SETENV: NOPASSWD: /usr/bin/git, /usr/bin/hg, /usr/bin/ssh
-phabricator ALL=(phab-daemon) SETENV: NOPASSWD: /usr/bin/git, /usr/bin/git-upload-pack, /usr/bin/git-receive-pack, /usr/bin/hg, /usr/bin/ssh
