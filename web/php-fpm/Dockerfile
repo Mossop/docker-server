@@ -6,6 +6,8 @@ ARG VERSION=7.3.11
 ENV PHPCFLAGS="-fstack-protector-strong -fpic -fpie"
 ENV PHPLDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
 
+COPY init /init/
+
 RUN CFLAGS="$PHPCFLAGS $CFLAGS" \
     CPPFLAGS="$CFLAGS" \
     LDFLAGS="$PHPLDFLAGS $LDFLAGS" \
@@ -91,4 +93,4 @@ COPY etc/php-fpm.d/* /etc/php-fpm.d/
 
 EXPOSE 9000
 
-CMD ["php-fpm"]
+CMD ["/init/init"]
