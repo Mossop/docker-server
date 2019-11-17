@@ -13,10 +13,6 @@ _kill() {
 }
 trap _kill SIGKILL
 
-
-child=$!
-wait "$child"
-
 if [ -f "/init/environment" ]; then
   . /init/environment
 fi
