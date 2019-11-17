@@ -33,5 +33,6 @@ RUN set -ex && \
     mkusr vmail /var/mail/vmail 2003
 
 COPY init/* /init/
+ENV SVDIR=/init/services
 
 CMD ["/bin/sh"]

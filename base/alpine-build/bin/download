@@ -4,5 +4,4 @@ aria2c \
   --min-split-size=20M \
   --max-connection-per-server=10 \
   --split=10 \
-  $@ \
-  > /dev/null
+  $@

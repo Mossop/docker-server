@@ -1,5 +1,22 @@
 #! /bin/sh
 
+_term() {
+  kill -HUP "$child" 2>/dev/null
+}
+trap _term SIGTERM
+_int() {
+  kill -HUP "$child" 2>/dev/null
+}
+trap _int SIGINT
+_kill() {
+  kill -KILL "$child" 2>/dev/null
+}
+trap _kill SIGKILL
+
+
+child=$!
+wait "$child"
+
 if [ -f "/init/environment" ]; then
   . /init/environment
 fi
@@ -8,7 +25,11 @@ if [ -f "/init/startup" ]; then
   /init/startup
 fi
 
-/init/run
+runsvdir /init/services &
+child=$!
+wait
+
+sv down `ls /init/services`
 
 if [ -f "/init/shutdown" ]; then
   /init/shutdown
