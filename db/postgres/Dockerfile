@@ -4,7 +4,7 @@ FROM mossop/alpine-build
 ARG VERSION=12.1
 
 RUN /usr/src/installers/install-locales && \
-    mkusr postgres /var/www 2601 && \
+    mkusr postgres /var/www 2901 && \
     apk-add \
       su-exec && \
     apk-begin .builddeps \

@@ -9,13 +9,14 @@ COPY bin/* /usr/local/bin/
 
 RUN apk-add \
       sudo \
-      openssh-server && \
+      openssh-server \
+      su-exec && \
     /usr/src/installers/install-locales && \
-    mkdir -p /opt/rhodecode/store /rhodecode/cache /rhodecode/repos /rhodecode/.ssh /rhodecode/services/ssh && \
-    mkusr rhodecode /rhodecode 2501 && \
+    mkdir -p /opt/rhodecode/store /rhodecode/cache /rhodecode/repos /rhodecode/services/ssh && \
+    mkusr rhodecode /rhodecode 2801 && \
     passwd -u rhodecode && \
     sed -E -e s@:/rhodecode:/sbin/nologin@:/rhodecode:/bin/sh@ -i /etc/passwd && \
-    chown rhodecode:rhodecode /rhodecode/repos /rhodecode/.ssh /rhodecode/services && \
+    chown rhodecode:rhodecode /rhodecode/repos /rhodecode/services /rhodecode/services/ssh && \
     download -d /rhodecode/cache -o MANIFEST https://dls.rhodecode.com/linux/MANIFEST && \
     rm -rf /usr/src/*
 

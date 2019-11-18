@@ -1,4 +1,4 @@
 #! /bin/sh
 
 cd /rhodecode/services/community
-./profile/bin/gunicorn -c gunicorn_config.py -u rhodecode --paster rhodecode.ini
+./profile/bin/gunicorn -c gunicorn_config.py -u rhodecode -g rhodecode --paster rhodecode.ini
