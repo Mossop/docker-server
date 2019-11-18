@@ -43,7 +43,6 @@ RUN CFLAGS="$PHPCFLAGS $CFLAGS" \
       tar -xJf - -C /usr/src/php --strip-components=1 && \
     cd /usr/src/php && \
     ./configure \
-      --prefix=/usr \
       --sysconfdir=/etc \
       --with-config-file-path="/etc/php" \
       --with-config-file-scan-dir="/etc/php/conf.d" \
@@ -74,10 +73,10 @@ RUN CFLAGS="$PHPCFLAGS $CFLAGS" \
       --with-fpm-group=www-data \
       --disable-cgi && \
     make && \
-    mkdir -p /usr/src/build && \
+    mkdir -p /usr/src/build /usr/local/include && \
     make INSTALL_ROOT=/usr/src/build install && \
-    cp -a /usr/src/build/usr/include/php /usr/include/php && \
-    cp /usr/src/build/usr/bin/php-config /usr/bin/php-config && \
+    cp -a /usr/src/build/usr/local/include/php /usr/local/include/php && \
+    cp /usr/src/build/usr/local/bin/php-config /usr/local/bin/php-config && \
     strip-build build && \
     install-build build && \
     cp /usr/src/php/php.ini-production /etc/php/php.ini && \
