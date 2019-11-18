@@ -1,0 +1,6 @@
+#! /bin/sh
+
+if [ ! -f "/var/lib/pgadmin4/pgadmin4.db" ]; then
+  cd /usr/src/pgadmin/web
+  python3 setup.py
+fi
