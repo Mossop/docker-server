@@ -1,6 +1,0 @@
-#! /bin/sh
-
-syslogd -C512
-postfix start
-
-exec block-syslog

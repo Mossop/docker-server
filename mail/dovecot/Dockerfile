@@ -9,8 +9,8 @@ RUN mkusr dovecot /var/mail/vmail 2101 && \
       dovecot-pop3d \
       dovecot-mysql
 
-COPY bin/* /usr/local/bin/
+COPY init /init/
 
 EXPOSE 24 993 995
 
-CMD ["/usr/local/bin/init"]
+CMD ["/init/init"]

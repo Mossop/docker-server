@@ -8,8 +8,8 @@ RUN mkusr postfix /var/mail/spool 2051 && \
       postfix \
       postfix-mysql
 
-COPY bin/* /usr/local/bin/
+COPY init /init/
 
 EXPOSE 25 587
 
-CMD ["/usr/local/bin/init"]
+CMD ["/init/init"]

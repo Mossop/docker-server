@@ -3,6 +3,8 @@ FROM mossop/alpine-build
 
 ARG VERSION=1.6
 
+COPY init /init/
+
 RUN apk-begin .builddeps \
       coreutils \
       make \
@@ -15,6 +17,7 @@ RUN apk-begin .builddeps \
     mkdir /usr/src/postsrsd/build && \
     cd /usr/src/postsrsd/build && \
     cmake \
+      -DCMAKE_INSTALL_PREFIX=/usr/local \
       -DGENERATE_SRS_SECRET=OFF \
       -DINIT_FLAVOR=none \
       -DSYSCONF_DIR=/etc/postsrsd \
@@ -29,8 +32,6 @@ RUN apk-begin .builddeps \
     rm /etc/postsrsd/postsrsd && \
     apk-end .builddeps
 
-COPY bin/* /usr/local/bin/
-
 ENV SRS_SEPARATOR==
 ENV SRS_SECRET=/etc/postsrsd/postsrsd.secret
 ENV SRS_HASHLENGTH=4
@@ -41,4 +42,4 @@ ENV RUN_AS=nobody
 ENV SRS_LISTEN_ADDR=0.0.0.0
 ENV CHROOT=/usr/local/lib/postsrsd
 
-CMD ["/usr/local/bin/init"]
+CMD ["/init/init"]

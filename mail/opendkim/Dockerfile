@@ -5,6 +5,7 @@ ARG VERSION=2.10.3
 
 RUN mkdir -p /usr/src
 COPY *.patch /usr/src/
+COPY init /init/
 
 RUN mkdir -p /var/lib/dkim && \
     mkusr dkim /var/lib/dkim 2601 && \
@@ -41,10 +42,8 @@ RUN mkdir -p /var/lib/dkim && \
     apk-end .builddeps && \
     mkdir -p /etc/opendkim
 
-COPY bin/* /usr/local/bin/
-
 WORKDIR /etc/opendkim/keys
 
 EXPOSE 12301
 
-CMD ["/usr/local/bin/init"]
+CMD ["/init/init"]

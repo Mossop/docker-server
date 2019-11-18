@@ -1,0 +1,5 @@
+#! /bin/sh
+
+if [ ! -f "$SRS_SECRET" ]; then
+  dd if=/dev/urandom bs=18 count=1 | base64 > $SRS_SECRET
+fi

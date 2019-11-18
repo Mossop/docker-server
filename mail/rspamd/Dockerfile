@@ -3,6 +3,8 @@ FROM mossop/alpine-build
 
 ARG VERSION=2.1
 
+COPY init /init/
+
 RUN mkdir -p /var/lib/rspamd && \
     mkusr rspamd /var/lib/rspamd 2501 && \
     chown rspamd:rspamd /var/lib/rspamd && \
@@ -32,7 +34,10 @@ RUN mkdir -p /var/lib/rspamd && \
     git checkout $VERSION && \
     mkdir /usr/src/build && \
     cd /usr/src/build && \
-    cmake -DCONFDIR=/etc/rspamd ../rspamd && \
+    cmake \
+      -DCONFDIR=/etc/rspamd \
+      -DCMAKE_INSTALL_PREFIX=/usr/local \
+      ../rspamd && \
     make && \
     mkdir /usr/src/final && \
     DESTDIR=/usr/src/final make install && \
@@ -46,4 +51,4 @@ RUN mkdir -p /var/lib/rspamd && \
 
 EXPOSE 11333
 
-CMD ["rspamd", "-f", "-u", "rspamd", "-g", "rspamd"]
+CMD ["/init/init"]
