@@ -1,0 +1,28 @@
+#! /bin/sh
+
+set -e
+apk-begin .builddeps \
+  coreutils \
+  make \
+  gcc \
+  linux-headers \
+  pkgconf \
+  musl-dev \
+  readline-dev \
+  zlib-dev
+get-source postgres "https://ftp.postgresql.org/pub/source/v${POSTGRES_VERSION}/postgresql-${POSTGRES_VERSION}.tar.bz2"
+cd /usr/src/postgres
+mkdir -p /usr/src/build
+./configure \
+  --prefix=/usr/local
+make -C src/interfaces/libpq
+make DESTDIR=/usr/src/build -C src/interfaces/libpq install
+make -C src/bin/pg_config
+make DESTDIR=/usr/src/build -C src/bin/pg_config install
+make DESTDIR=/usr/src/build -C src/include install
+cp -R /usr/src/build/usr/local/include/* /usr/local/include
+strip-build build
+install-build build
+cd /usr/src
+rm -rf /usr/src/postgres
+apk-end .builddeps
