@@ -28,8 +28,8 @@ RUN mkusr redis /var/lib/redis 2301 && \
 
 COPY redis.conf /etc/redis.conf
 
-COPY bin/* /usr/local/bin/
+COPY init /init/
 
 EXPOSE 6379
 
-CMD ["/usr/local/bin/init"]
+CMD ["/init/init"]

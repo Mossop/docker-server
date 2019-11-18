@@ -1,3 +1,0 @@
-#! /bin/sh
-
-exec su-exec redis:redis redis-server /etc/redis.conf

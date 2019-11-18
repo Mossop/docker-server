@@ -1,0 +1,5 @@
+#! /bin/sh
+
+trap "kill -TERM -1" KILL TERM INT
+exec su-exec redis:redis redis-server /etc/redis.conf &
+wait
