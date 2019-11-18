@@ -1,0 +1,9 @@
+#! /bin/sh
+
+chown -R postgres:postgres /usr/local/pgsql/data
+
+if [ ! -f "/usr/local/pgsql/data/postgres.conf" ]; then
+  su-exec postgres initdb -D /usr/local/pgsql/data
+
+  sed -E -e "s/#listen_addresses =.*/listen_addresses = '0.0.0.0'/" -i /usr/local/pgsql/data/postgresql.conf
+fi
