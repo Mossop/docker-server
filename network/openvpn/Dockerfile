@@ -5,8 +5,8 @@ RUN apk-add openvpn && \
     mkdir -p /etc/openvpn && \
     mkdir -p /var/openvpn/pid
 
-COPY bin/* /usr/local/bin/
+COPY init /init/
 
 EXPOSE 1194
 
-CMD ["/usr/local/bin/init"]
+CMD ["/init/init"]
