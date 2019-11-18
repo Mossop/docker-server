@@ -21,9 +21,8 @@ apk-begin .builddeps \
   readline-dev
 
 get-source python https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tar.xz
-build-package python build \
-  --prefix=/usr
-cp -R /usr/src/build/usr/include/python2.7 /usr/include/python2.7
+build-package python build
+cp -R /usr/src/build/usr/local/include/python2.7 /usr/local/include/python2.7
 strip-build build
 install-build build
 rm -rf /usr/src/python

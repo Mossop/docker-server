@@ -10,7 +10,10 @@ set -e
 cd /usr/src/$PACKAGE
 
 echo "Configuring and building with arguments: $CONFARGS" > /dev/stderr
-./configure $CONFARGS
+./configure \
+  --prefix=/usr/local \
+  --sysconfdir=/etc \
+  $CONFARGS
 make
 
 mkdir -p /usr/src/$TARGET

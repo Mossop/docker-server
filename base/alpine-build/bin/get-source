@@ -5,11 +5,9 @@ URL=$2
 
 set -e
 echo "Downloading source package from $URL" > /dev/stderr
-apk add --no-cache --virtual .get-source curl
 set -x
 mkdir -p /usr/src/$PACKAGE
 cd /usr/src
 download -o $PACKAGE.tar "$URL"
 tar -xf /usr/src/$PACKAGE.tar -C /usr/src/$PACKAGE --strip-components=1
 rm /usr/src/$PACKAGE.tar
-apk del --no-network .get-source

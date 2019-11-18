@@ -14,26 +14,26 @@ apk add --no-cache --virtual .strip-build binutils
 # Strip docs
 echo "Stripping docs" > /dev/stderr
 for i in doc man info html sgml licenses gtk-doc ri help; do
-  if [ -d "$TARGET/usr/share/$i" ]; then
-    run rm -rf "$TARGET/usr/share/$i"
+  if [ -d "$TARGET/usr/local/share/$i" ]; then
+    run rm -rf "$TARGET/usr/local/share/$i"
   fi
 done
 
 # Strip dev
 echo "Stripping development files" > /dev/stderr
 for i in \
-  $TARGET/usr/include \
-  $TARGET/usr/lib/pkgconfig \
-  $TARGET/usr/share/aclocal \
-  $TARGET/usr/share/gettext \
-  $TARGET/usr/bin/*-config \
-  $TARGET/usr/share/vala/vapi \
-  $TARGET/usr/share/gir-[0-9]* \
-  $TARGET/usr/share/qt*/mkspecs \
-  $TARGET/usr/lib/qt*/mkspecs \
-  $TARGET/usr/lib/cmake \
-  $(find $TARGET -name include -type d) \
-  $(find $TARGET/usr -name '*.[acho]' -o -name '*.prl' 2>/dev/null); do
+  $TARGET/usr/local/include \
+  $TARGET/usr/local/lib/pkgconfig \
+  $TARGET/usr/local/share/aclocal \
+  $TARGET/usr/local/share/gettext \
+  $TARGET/usr/local/bin/*-config \
+  $TARGET/usr/local/share/vala/vapi \
+  $TARGET/usr/local/share/gir-[0-9]* \
+  $TARGET/usr/local/share/qt*/mkspecs \
+  $TARGET/usr/local/lib/qt*/mkspecs \
+  $TARGET/usr/local/lib/cmake \
+  $(find $TARGET/usr/local -name include -type d) \
+  $(find $TARGET/usr/local -name '*.[acho]' -o -name '*.prl' 2>/dev/null); do
     if [ -e "$i" ] || [ -L "$i" ]; then
       run rm -rf $i
     fi
