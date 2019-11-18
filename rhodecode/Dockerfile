@@ -12,7 +12,7 @@ RUN apk-add \
       openssh-server && \
     /usr/src/installers/install-locales && \
     mkdir -p /opt/rhodecode/store /rhodecode/cache /rhodecode/repos /rhodecode/.ssh /rhodecode/services/ssh && \
-    mkusr rhodecode /rhodecode 2500 && \
+    mkusr rhodecode /rhodecode 2501 && \
     passwd -u rhodecode && \
     sed -E -e s@:/rhodecode:/sbin/nologin@:/rhodecode:/bin/sh@ -i /etc/passwd && \
     chown rhodecode:rhodecode /rhodecode/repos /rhodecode/.ssh /rhodecode/services && \
