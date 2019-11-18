@@ -1,0 +1,35 @@
+#! /bin/sh
+
+VERSION=3.8.0
+
+set -e
+apk-begin .builddeps \
+  autoconf \
+  coreutils \
+  make \
+  gcc \
+  linux-headers \
+  pkgconf \
+  musl-dev \
+  db-dev \
+  ncurses-dev \
+  openssl-dev \
+  tcl-dev \
+  tk-dev \
+  bzip2-dev \
+  gdbm-dev \
+  readline-dev \
+  libffi-dev \
+  sqlite-dev
+
+get-source python https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tar.xz
+build-package python build
+mkdir -p /usr/local/include
+cp -R /usr/src/build/usr/local/include/python3.8 /usr/local/include/python3.8
+strip-build build
+install-build build
+rm -rf /usr/src/python
+cd /usr/src
+pip3 install --upgrade pip
+
+apk-end .builddeps
