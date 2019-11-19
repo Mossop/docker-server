@@ -1,5 +1,3 @@
 #! /bin/sh
 
-trap "kill -TERM -1" KILL TERM INT
-opendkim -f -x /etc/opendkim/opendkim.conf &
-wait
+exec opendkim -f -x /etc/opendkim/opendkim.conf

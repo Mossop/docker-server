@@ -1,5 +1,3 @@
 #! /bin/sh
 
-trap "kill -TERM -1" KILL TERM INT
-postfix start-fg &
-wait
+exec postfix start-fg

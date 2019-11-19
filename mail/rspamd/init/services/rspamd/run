@@ -1,5 +1,3 @@
 #! /bin/sh
 
-trap "kill -TERM -1" KILL TERM INT
-rspamd -f -u rspamd -g rspamd &
-wait
+exec rspamd -f -u rspamd -g rspamd

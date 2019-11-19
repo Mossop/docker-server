@@ -1,7 +1,5 @@
 #! /bin/sh
 
-trap "kill -TERM -1" KILL TERM INT
-postsrsd -f "$SRS_FORWARD_PORT" -r "$SRS_REVERSE_PORT" -d "$SRS_DOMAIN" \
+exec postsrsd -f "$SRS_FORWARD_PORT" -r "$SRS_REVERSE_PORT" -d "$SRS_DOMAIN" \
   -s "$SRS_SECRET" -a "$SRS_SEPARATOR" -n "$SRS_HASHLENGTH" -N "$SRS_HASHMIN" \
-  -u "$RUN_AS" -c "$CHROOT" -l "$SRS_LISTEN_ADDR" -X"$SRS_EXCLUDE_DOMAINS" &
-wait
+  -u "$RUN_AS" -c "$CHROOT" -l "$SRS_LISTEN_ADDR" -X"$SRS_EXCLUDE_DOMAINS"

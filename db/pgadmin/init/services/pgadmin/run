@@ -1,9 +1,7 @@
 #! /bin/sh
 
 cd /usr/src/pgadmin/web
-trap "kill -TERM -1" KILL TERM INT
-gunicorn --bind 0.0.0.0:80 \
+exec gunicorn --bind 0.0.0.0:80 \
   --workers=1 \
   --threads=25 \
   pgAdmin4:app
-wait

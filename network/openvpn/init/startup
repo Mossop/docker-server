@@ -9,6 +9,6 @@ for config in $CONFIGS; do
   mkdir -p /init/configs/$config
   echo "#! /bin/sh" > /init/configs/$config/run
   echo "cd /etc/openvpn" >> /init/configs/$config/run
-  echo "openvpn --config ${config}.ovpn" >> /init/configs/$config/run
+  echo "exec openvpn --config ${config}.ovpn" >> /init/configs/$config/run
   chmod 755 /init/configs/$config/run
 done

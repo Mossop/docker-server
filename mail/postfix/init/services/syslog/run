@@ -1,5 +1,3 @@
 #! /bin/sh
 
-trap "kill -TERM -1" KILL TERM INT
-logread -F &
-wait
+exec logread -F

@@ -1,5 +1,3 @@
 #! /bin/sh
 
-trap "kill -TERM -1" KILL TERM INT
-su-exec postgres postgres -D /usr/local/pgsql/data &
-wait
+exec su-exec postgres postgres -D /usr/local/pgsql/data

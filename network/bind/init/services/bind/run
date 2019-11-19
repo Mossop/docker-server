@@ -1,5 +1,3 @@
 #! /bin/sh
 
-trap "kill -TERM -1" KILL TERM INT
-named -c /etc/named/named.conf -g -u named &
-wait
+exec named -c /etc/named/named.conf -g -u named

@@ -1,4 +1,4 @@
 #! /bin/sh
 
 cd /rhodecode/services/vcsserver
-./profile/bin/gunicorn -c gunicorn_config.py -u rhodecode -g rhodecode --paster vcsserver.ini
+exec ./profile/bin/gunicorn -c gunicorn_config.py -u rhodecode -g rhodecode --paster vcsserver.ini
