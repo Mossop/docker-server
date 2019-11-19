@@ -22,6 +22,7 @@ apk-begin .builddeps \
 
 get-source python https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tar.xz
 build-package python build
+mkdir -p /usr/local/include
 cp -R /usr/src/build/usr/local/include/python2.7 /usr/local/include/python2.7
 strip-build build
 install-build build
