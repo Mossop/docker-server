@@ -1,8 +1,0 @@
-#! /bin/sh
-
-FILE=${1:-/dev/null}
-
-trap 'trap - TERM; kill -1' TERM
-tail -f $FILE &
-wait
-exit 0

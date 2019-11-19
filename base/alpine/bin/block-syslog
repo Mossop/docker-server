@@ -1,6 +1,0 @@
-#! /bin/sh
-
-trap 'trap - TERM; kill -1' TERM
-logread -F &
-wait
-exit 0
