@@ -1,0 +1,7 @@
+#! /bin/sh
+
+if [ ! -f /jira/base/conf/server.xml ]; then
+  cp /opt/jira/conf/* /jira/base/conf
+fi
+
+chown -R jira:jira /jira/base/conf /jira/home

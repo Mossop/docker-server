@@ -1,0 +1,4 @@
+#! /bin/sh
+
+cd /opt/jira
+exec su-exec jira:jira ./bin/start-jira.sh -fg
