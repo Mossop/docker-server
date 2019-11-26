@@ -1,3 +1,0 @@
-#! /bin/sh
-
-exec rspamd -f -u rspamd -g rspamd
