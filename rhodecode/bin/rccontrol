@@ -1,3 +1,0 @@
-#! /bin/sh
-
-/rhodecode/profile/bin/rccontrol -I /rhodecode/services $@
