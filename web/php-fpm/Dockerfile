@@ -8,7 +8,8 @@ ENV PHPLDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
 
 COPY init /init/
 
-RUN CFLAGS="$PHPCFLAGS $CFLAGS" \
+RUN /usr/src/installers/install-libpq && \
+    CFLAGS="$PHPCFLAGS $CFLAGS" \
     CPPFLAGS="$CFLAGS" \
     LDFLAGS="$PHPLDFLAGS $LDFLAGS" \
     mkusr php /var/www 2401 && \
@@ -52,6 +53,7 @@ RUN CFLAGS="$PHPCFLAGS $CFLAGS" \
       --enable-mbstring \
       --enable-mysqlnd \
       --with-mysqli \
+      --with-pgsql \
       --with-bz2 \
       --enable-zip \
       --with-password-argon2 \
