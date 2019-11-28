@@ -1,0 +1,6 @@
+#! /bin/sh
+
+exec /usr/local/bin/amavisd \
+  -c /etc/amavisd.conf \
+  -c /etc/amavisd/amavisd.conf \
+  foreground

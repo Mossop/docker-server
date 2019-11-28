@@ -1,0 +1,19 @@
+#! /bin/sh
+
+syslogd -C512
+
+mkdir -p /amavisd/tmp /amavisd/var /amavisd/db /amavisd/home
+chown -R amavis:amavis /amavisd
+
+if [ ! -d "/amavisd/conf" ]; then
+  mkdir -p /amavisd/conf
+  cp /init/conf/* /amavisd/conf
+fi
+
+mkdir -p /etc/amavisd
+cp /amavisd/conf/*.conf /etc/amavisd
+cp /amavisd/conf/*.cf /etc/mail/spamassassin
+chown -R root /etc/amavisd
+find /etc/amavisd -type f | xargs chmod 644
+
+sa-update
