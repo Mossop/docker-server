@@ -1,5 +1,7 @@
 #! /bin/sh
 
+VERSION=12.1
+
 set -e
 apk-begin .builddeps \
   coreutils \
@@ -10,9 +12,9 @@ apk-begin .builddeps \
   musl-dev \
   readline-dev \
   zlib-dev
-get-source postgres "https://ftp.postgresql.org/pub/source/v${POSTGRES_VERSION}/postgresql-${POSTGRES_VERSION}.tar.bz2"
+get-source postgres "https://ftp.postgresql.org/pub/source/v${VERSION}/postgresql-${VERSION}.tar.bz2"
 cd /usr/src/postgres
-mkdir -p /usr/src/build
+mkdir -p /usr/src/build /usr/local/include
 ./configure \
   --prefix=/usr/local
 make -C src/interfaces/libpq
