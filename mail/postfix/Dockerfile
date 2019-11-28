@@ -6,7 +6,9 @@ RUN mkusr postfix /var/mail/spool 2051 && \
     addgroup postfix mail && \
     apk-add \
       postfix \
-      postfix-mysql
+      postfix-pgsql && \
+    touch /etc/aliases && \
+    postalias /etc/aliases
 
 COPY init /init/
 

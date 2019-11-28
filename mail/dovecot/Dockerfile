@@ -7,7 +7,7 @@ RUN mkusr dovecot /var/mail/vmail 2101 && \
       dovecot \
       dovecot-lmtpd \
       dovecot-pop3d \
-      dovecot-mysql
+      dovecot-pgsql
 
 COPY init /init/
 
