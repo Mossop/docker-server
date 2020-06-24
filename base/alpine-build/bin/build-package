@@ -12,6 +12,9 @@ cd /usr/src/$PACKAGE
 echo "Configuring and building with arguments: $CONFARGS" > /dev/stderr
 ./configure \
   --prefix=/usr/local \
+  --sysconfdir=/etc \
+  --datarootdir=/var/lib \
+  --localstatedir=/var \
   $CONFARGS
 make
 

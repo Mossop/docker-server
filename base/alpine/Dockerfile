@@ -1,5 +1,5 @@
 # build = { "image": "mossop/alpine", "type": "squashed" }
-FROM alpine:3.10.3
+FROM alpine:3.12
 
 COPY bin/* /usr/local/bin/
 
@@ -24,7 +24,6 @@ RUN set -ex && \
     deluser postmaster 2> /dev/null && \
     deluser cyrus 2> /dev/null && \
     deluser mail 2> /dev/null && \
-    deluser postgres 2> /dev/null && \
 #
 #   Create shared users.
 #

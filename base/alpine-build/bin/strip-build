@@ -9,8 +9,6 @@ run() {
 
 set -e
 
-apk add --no-cache --virtual .strip-build binutils
-
 # Strip docs
 echo "Stripping docs" > /dev/stderr
 for i in doc man info html sgml licenses gtk-doc ri help; do
@@ -22,7 +20,6 @@ done
 # Strip dev
 echo "Stripping development files" > /dev/stderr
 for i in \
-  $TARGET/usr/local/include \
   $TARGET/usr/local/lib/pkgconfig \
   $TARGET/usr/local/share/aclocal \
   $TARGET/usr/local/share/gettext \
@@ -39,18 +36,9 @@ for i in \
     fi
 done
 
-# Strip binaries
-echo "Stripping binaries" > /dev/stderr
-scanelf --recursive --nobanner --osabi --etype "ET_DYN,ET_EXEC" $TARGET \
-  | while read type osabi filename; do
-    # scanelf may have picked up a temp file so verify that file still exists
-    [ -e "$filename" ] || continue
-    [ "$osabi" != "STANDALONE" ] || continue
-    run strip "${filename}"
-done
+strip-binaries $1
 
 # Remove libtool info
 echo "Removing libtool info" > /dev/stderr
 find $TARGET -name '*.la' | xargs rm -f
 
-apk del --no-network .strip-build

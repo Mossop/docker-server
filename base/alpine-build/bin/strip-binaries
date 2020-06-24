@@ -1,0 +1,24 @@
+#! /bin/sh
+
+TARGET=/usr/src/$1
+
+run() {
+  echo $@
+  $@
+}
+
+set -e
+
+apk add --no-cache --virtual .strip-build binutils
+
+# Strip binaries
+echo "Stripping binaries" > /dev/stderr
+scanelf --recursive --nobanner --osabi --etype "ET_DYN,ET_EXEC" $TARGET \
+  | while read type osabi filename; do
+    # scanelf may have picked up a temp file so verify that file still exists
+    [ -e "$filename" ] || continue
+    [ "$osabi" != "STANDALONE" ] || continue
+    run strip "${filename}"
+done
+
+apk del --no-network .strip-build
