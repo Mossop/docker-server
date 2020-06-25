@@ -1,0 +1,8 @@
+#! /bin/sh
+
+if [ ! -d "/var/lib/mysql/mysql" ]; then
+  mysqld --initialize-insecure --user=mysql
+  mysql_ssl_rsa_setup
+fi
+
+chown -R mysql:mysql /var/lib/mysql
