@@ -1,7 +1,7 @@
 # build = { "image": "mossop/bind" }
 FROM mossop/alpine-build
 
-ARG VERSION=9.14.7
+ARG VERSION=9.16.4
 
 COPY init /init/
 
@@ -14,9 +14,10 @@ RUN mkusr named /etc/named 2701 && \
       pkgconf \
       musl-dev \
       openssl-dev \
-      libcap-dev && \
+      libcap-dev \
+      libuv-dev && \
     rm /var/run && \
-    conf-build "https://downloads.isc.org/isc/bind9/${VERSION}/bind-${VERSION}.tar.gz" \
+    conf-build "https://downloads.isc.org/isc/bind9/${VERSION}/bind-${VERSION}.tar.xz" \
       --without-python \
       --disable-symtable && \
     set -x && \
