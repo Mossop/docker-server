@@ -20,6 +20,7 @@ RUN mkdir -p /var/lib/dkim && \
       m4 \
       make \
       cmake \
+      patch \
       gcc \
       g++ \
       linux-headers \
