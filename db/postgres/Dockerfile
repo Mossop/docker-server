@@ -1,7 +1,7 @@
 # build = { "image": "mossop/postgres" }
 FROM mossop/alpine-build
 
-ARG VERSION=12.1
+ARG VERSION=12.3
 
 RUN /usr/src/installers/install-locales && \
     mkusr postgres /var/www 2901 && \
