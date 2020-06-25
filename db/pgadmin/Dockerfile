@@ -1,8 +1,7 @@
 # build = { "image": "mossop/pgadmin" }
 FROM mossop/alpine-build
 
-ARG VERSION=4.15
-ARG POSTGRES_VERSION=12.1
+ARG VERSION=4.22
 
 RUN /usr/src/installers/install-python3 && \
     /usr/src/installers/install-libpq && \
