@@ -1,7 +1,7 @@
 # build = { "image": "mossop/nginx" }
 FROM mossop/alpine-build
 
-ARG VERSION=1.17.5
+ARG VERSION=1.19.0
 
 RUN mkusr nginx /var/www 2201 && \
     addgroup nginx www-data && \
@@ -15,7 +15,11 @@ RUN mkusr nginx /var/www 2201 && \
       pkgconf \
       zlib-dev \
       musl-dev && \
-    conf-build "https://nginx.org/download/nginx-$VERSION.tar.gz" \
+    get-source build "https://nginx.org/download/nginx-$VERSION.tar.gz" && \
+    echo "Configuring and building..." > /dev/stderr && \
+    cd /usr/src/build && \
+    ./configure \
+      --prefix=/usr/local \
       --conf-path=/etc/nginx/nginx.conf \
       \
       --user=nginx \
@@ -31,6 +35,13 @@ RUN mkusr nginx /var/www 2201 && \
       --with-http_stub_status_module \
       \
       --without-http_empty_gif_module && \
+    make && \
+    mkdir -p /usr/src/target && \
+    echo "Installing to temporary root..." > /dev/stderr && \
+    make DESTDIR=/usr/src/target install && \
+    rm -rf /usr/src/build && \
+    strip-build target && \
+    install-build target && \
     apk-end .builddeps && \
     mkdir -p /etc/nginx/conf.d && \
     mkdir -p /etc/nginx/vhosts.d
