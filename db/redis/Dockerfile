@@ -1,7 +1,7 @@
 # build = { "image": "mossop/redis" }
 FROM mossop/alpine-build
 
-ARG VERSION=5.0.5
+ARG VERSION=6.0.5
 
 RUN mkusr redis /var/lib/redis 2301 && \
     apk-add su-exec && \
