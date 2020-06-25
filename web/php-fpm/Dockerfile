@@ -1,7 +1,7 @@
 # build = { "image": "mossop/php-fpm" }
 FROM mossop/alpine-build
 
-ARG VERSION=7.3.11
+ARG VERSION=7.4.7
 
 ENV PHPCFLAGS="-fstack-protector-strong -fpic -fpie"
 ENV PHPLDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
@@ -37,7 +37,9 @@ RUN /usr/src/installers/install-libpq && \
       libxpm-dev \
       re2c \
       bison \
-      freetype-dev && \
+      freetype-dev \
+      sqlite-dev \
+      oniguruma-dev && \
     set -e && \
     mkdir -p /usr/src/php && \
     curl -L -s "https://secure.php.net/get/php-$VERSION.tar.xz/from/this/mirror" | \
@@ -55,43 +57,42 @@ RUN /usr/src/installers/install-libpq && \
       --with-mysqli \
       --with-pgsql \
       --with-bz2 \
-      --enable-zip \
+      --with-zip \
       --with-password-argon2 \
       --with-sodium \
       --with-curl \
       --with-libedit \
       --with-openssl \
       --with-zlib \
-      --with-gd \
-      --with-webp-dir=/usr/include \
-      --with-jpeg-dir=/usr/include \
-      --with-png-dir=/usr/include \
+      --enable-gd \
+      --with-webp \
+      --with-jpeg \
       --with-zlib-dir=/usr/include \
-      --with-xpm-dir=/usr/include \
-      --with-freetype-dir=/usr/include \
+      --with-xpm \
+      --with-freetype \
       --enable-pcntl \
       --enable-fpm \
       --with-fpm-user=php \
       --with-fpm-group=www-data \
-      --disable-cgi && \
-    make && \
-    mkdir -p /usr/src/build /usr/local/include && \
-    make INSTALL_ROOT=/usr/src/build install && \
-    cp -a /usr/src/build/usr/local/include/php /usr/local/include/php && \
-    cp /usr/src/build/usr/local/bin/php-config /usr/local/bin/php-config && \
-    strip-build build && \
-    install-build build && \
-    cp /usr/src/php/php.ini-production /etc/php/php.ini && \
-    pecl channel-update pecl.php.net && \
-    apk-end .builddeps && \
-    mv /etc/php-fpm.d/www.conf.default /etc/php-fpm.d/www.conf && \
-    mv /etc/php-fpm.conf.default /etc/php-fpm.conf && \
-    rm -rf /usr/src/php && \
-    echo "zend_extension=opcache.so" >>/etc/php/php.ini && \
-    echo "opcache.enabled=1" >> /etc/php/php.ini
+      --disable-cgi
+#     make && \
+#     mkdir -p /usr/src/build /usr/local/include && \
+#     make INSTALL_ROOT=/usr/src/build install && \
+#     cp -a /usr/src/build/usr/local/include/php /usr/local/include/php && \
+#     cp /usr/src/build/usr/local/bin/php-config /usr/local/bin/php-config && \
+#     strip-build build && \
+#     install-build build && \
+#     cp /usr/src/php/php.ini-production /etc/php/php.ini && \
+#     pecl channel-update pecl.php.net && \
+#     apk-end .builddeps && \
+#     mv /etc/php-fpm.d/www.conf.default /etc/php-fpm.d/www.conf && \
+#     mv /etc/php-fpm.conf.default /etc/php-fpm.conf && \
+#     rm -rf /usr/src/php && \
+#     echo "zend_extension=opcache.so" >>/etc/php/php.ini && \
+#     echo "opcache.enabled=1" >> /etc/php/php.ini
 
-COPY etc/php-fpm.d/* /etc/php-fpm.d/
+# COPY etc/php-fpm.d/* /etc/php-fpm.d/
 
-EXPOSE 9000
+# EXPOSE 9000
 
-CMD ["/init/init"]
+# CMD ["/init/init"]
