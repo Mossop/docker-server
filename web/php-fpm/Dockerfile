@@ -74,25 +74,26 @@ RUN /usr/src/installers/install-libpq && \
       --enable-fpm \
       --with-fpm-user=php \
       --with-fpm-group=www-data \
-      --disable-cgi
-#     make && \
-#     mkdir -p /usr/src/build /usr/local/include && \
-#     make INSTALL_ROOT=/usr/src/build install && \
-#     cp -a /usr/src/build/usr/local/include/php /usr/local/include/php && \
-#     cp /usr/src/build/usr/local/bin/php-config /usr/local/bin/php-config && \
-#     strip-build build && \
-#     install-build build && \
-#     cp /usr/src/php/php.ini-production /etc/php/php.ini && \
-#     pecl channel-update pecl.php.net && \
-#     apk-end .builddeps && \
-#     mv /etc/php-fpm.d/www.conf.default /etc/php-fpm.d/www.conf && \
-#     mv /etc/php-fpm.conf.default /etc/php-fpm.conf && \
-#     rm -rf /usr/src/php && \
-#     echo "zend_extension=opcache.so" >>/etc/php/php.ini && \
-#     echo "opcache.enabled=1" >> /etc/php/php.ini
+      --disable-cgi \
+      --with-pear && \
+    make && \
+    mkdir -p /usr/src/build /usr/local/include && \
+    make INSTALL_ROOT=/usr/src/build install && \
+    cp -a /usr/src/build/usr/local/include/php /usr/local/include/php && \
+    cp /usr/src/build/usr/local/bin/php-config /usr/local/bin/php-config && \
+    strip-build build && \
+    install-build build && \
+    cp /usr/src/php/php.ini-production /etc/php/php.ini && \
+    pecl channel-update pecl.php.net && \
+    apk-end .builddeps && \
+    mv /etc/php-fpm.d/www.conf.default /etc/php-fpm.d/www.conf && \
+    mv /etc/php-fpm.conf.default /etc/php-fpm.conf && \
+    rm -rf /usr/src/php && \
+    echo "zend_extension=opcache.so" >>/etc/php/php.ini && \
+    echo "opcache.enabled=1" >> /etc/php/php.ini
 
-# COPY etc/php-fpm.d/* /etc/php-fpm.d/
+COPY etc/php-fpm.d/* /etc/php-fpm.d/
 
-# EXPOSE 9000
+EXPOSE 9000
 
-# CMD ["/init/init"]
+CMD ["/init/init"]
